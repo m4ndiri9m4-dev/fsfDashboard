@@ -1,0 +1,809 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- Required Meta -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <title>FSF Dashboard | Live Data Monitor</title>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" xintegrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
+    <!-- Google Fonts for Futuristic Look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons (Replaces missing img/*) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Chart.js Library for Visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    
+    <!-- Custom CSS (Merged from styles.css) -->
+    <style>
+        body {
+            font-family: 'Orbitron', sans-serif;
+            background: linear-gradient(135deg, #4F46E5, #EC4899); /* Indigo to Pink */
+            color: white;
+            min-height: 100vh;
+            padding-top: 70px; /* Space for fixed navbar */
+        }
+        .gold-accent {
+            color: #FFD700 !important; /* Gold accent color */
+        }
+        .futuristic-card {
+            background-color: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
+            border-radius: 1rem;
+            padding: 20px;
+        }
+        .navbar-dark {
+            background-color: rgba(0, 0, 0, 0.8) !important;
+            border-bottom: 2px solid #FFD700;
+        }
+        .navbar-brand, .nav-link {
+            font-weight: 700;
+        }
+        .nav-link i {
+            margin-right: 5px;
+        }
+        .custom-report h2 {
+            color: #EC4899;
+            font-weight: 700;
+            font-size: 1.5rem;
+        }
+        .btn-warning {
+            background-color: #FFD700;
+            border-color: #FFD700;
+            color: #1a202c;
+            transition: all 0.3s;
+        }
+        .btn-warning:hover {
+            background-color: #FFD700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.8);
+            transform: scale(1.05);
+        }
+        /* Style for the fetched table data */
+        .table-dark thead th {
+            background-color: #4F46E5;
+            color: #FFD700;
+        }
+        .table-dark tbody tr:nth-child(odd) {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+        .table-dark tbody tr:hover {
+            background-color: rgba(255, 215, 0, 0.1);
+        }
+
+        /* Home Grid Styles */
+        .grid-button {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 30px 15px;
+            height: 100%;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            background-color: rgba(79, 70, 229, 0.6); /* Indigo base */
+            border: 2px solid #FFD700;
+            border-radius: 1rem;
+        }
+        .grid-button:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 0 25px rgba(255, 215, 0, 0.9);
+            background-color: rgba(79, 70, 229, 0.8);
+        }
+        .grid-button i {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        .grid-button span {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: white;
+            text-shadow: 0 0 5px #FFD700;
+        }
+        .chart-container {
+            position: relative;
+            height: 40vh; /* Set a default height for responsiveness */
+            width: 100%;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 0.5rem;
+            padding: 15px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Start Navigation -->
+    <nav class="navbar fixed-top navbar-expand-lg navbar-dark fixed-top">
+        <div class="container">
+            <a class="navbar-brand gold-accent" href="#">FSF Dashboard</a>
+            <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+
+            <!-- Start Links -->
+            <div class="collapse navbar-collapse" id="navbarResponsive">
+                <ul class="navbar-nav ms-auto">
+                    <!-- Home -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="switchView('home')">
+                            <i class="fas fa-home gold-accent"></i> Home
+                        </a>
+                    </li>
+                    <!-- Mandays -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="switchView('mandays')">
+                            <i class="fas fa-calendar-alt gold-accent"></i> Mandays
+                        </a>
+                    </li>
+                    <!-- Postpaid Monitoring -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="switchView('postpaid')">
+                            <i class="fas fa-wifi gold-accent"></i> Postpaid
+                        </a>
+                    </li>
+                    <!-- WowFi Pro Prepaid -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="switchView('wowfipro')">
+                            <i class="fas fa-box-open gold-accent"></i> WowFi Pro
+                        </a>
+                    </li>
+                    <!-- SIM Sold -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="switchView('simsold')">
+                            <i class="fas fa-sim-card gold-accent"></i> SIM Sold
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+    <!-- End Navigation -->
+
+    <!-- Main Container -->
+    <div class="container mt-5">
+        <div id="content-area">
+
+            <!-- ============================================== -->
+            <!-- 0. HOME INTERFACE (Default View)               -->
+            <!-- ============================================== -->
+            <div id="home-view" class="view-section">
+                <h1 class="text-center fw-bold mb-5 gold-accent">Dashboard Menu</h1>
+                <div class="row g-4">
+                    
+                    <!-- Mandays Button -->
+                    <div class="col-6 col-lg-3">
+                        <div class="grid-button" onclick="switchView('mandays')">
+                            <i class="fas fa-calendar-alt gold-accent"></i>
+                            <span>Mandays</span>
+                        </div>
+                    </div>
+                    
+                    <!-- Postpaid Button -->
+                    <div class="col-6 col-lg-3">
+                        <div class="grid-button" onclick="switchView('postpaid')">
+                            <i class="fas fa-wifi gold-accent"></i>
+                            <span>Postpaid</span>
+                        </div>
+                    </div>
+
+                    <!-- WowFi Pro Prepaid Button -->
+                    <div class="col-6 col-lg-3">
+                        <div class="grid-button" onclick="switchView('wowfipro')">
+                            <i class="fas fa-box-open gold-accent"></i>
+                            <span>WowFi Pro Prepaid</span>
+                        </div>
+                    </div>
+
+                    <!-- SIM Sold Button -->
+                    <div class="col-6 col-lg-3">
+                        <div class="grid-button" onclick="switchView('simsold')">
+                            <i class="fas fa-sim-card gold-accent"></i>
+                            <span>SIM Sold</span>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+            
+            <!-- ============================================== -->
+            <!-- 1. MANDAYS SECTION                             -->
+            <!-- ============================================== -->
+            <div id="mandays-view" class="view-section" style="display:none;">
+                <h1 class="text-center fw-bold mb-5 gold-accent">Mandays Monitoring</h1>
+
+                <!-- Mandays Summary -->
+                <div id="mandays-summary" class="custom-report futuristic-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2>📋 Mandays Monitoring Report</h2>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#mandays-content" aria-expanded="false" aria-controls="mandays-content">
+                            VIEW MANDAYS
+                        </button>
+                    </div>
+                    <div id="mandays-content" class="collapse mt-3">
+                        <div class="text-center p-3 text-secondary">Loading Mandays Data...</div>
+                    </div>
+                </div>
+
+                <!-- Seller Breakdown -->
+                <div id="seller-breakdown" class="custom-report futuristic-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2>🧑‍💼 Sellers Attendance</h2>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#seller-content" aria-expanded="false" aria-controls="seller-content">
+                            VIEW ATTENDANCE
+                        </button>
+                    </div>
+                    <div id="seller-content" class="collapse mt-3">
+                        <div class="text-center p-3 text-secondary">Loading Attendance Data...</div>
+                    </div>
+                </div>
+                
+            </div>
+            
+            <!-- ============================================== -->
+            <!-- 2. POSTPAID SECTION                            -->
+            <!-- ============================================== -->
+            <div id="postpaid-view" class="view-section" style="display:none;">
+                 <h1 class="text-center fw-bold mb-5 gold-accent">Postpaid Monitoring</h1>
+                 
+                <!-- Applications Submitted -->
+                <div id="postpaid-submitted-summary" class="custom-report futuristic-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2>No. of Applications Submitted</h2>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#postpaid-submitted-content" aria-expanded="false" aria-controls="postpaid-submitted-content">
+                            VIEW DATA
+                        </button>
+                    </div>
+                    <div id="postpaid-submitted-content" class="collapse mt-3">
+                        <div class="text-center p-3 text-secondary">Loading Submitted Applications Data...</div>
+                    </div>
+                </div>
+
+                <!-- Applications Approved -->
+                <div id="postpaid-approved-summary" class="custom-report futuristic-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2>No. of Applications Approved</h2>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#postpaid-approved-content" aria-expanded="false" aria-controls="postpaid-approved-content">
+                            VIEW DATA
+                        </button>
+                    </div>
+                    <div id="postpaid-approved-content" class="collapse mt-3">
+                        <div class="text-center p-3 text-secondary">Loading Approved Applications Data...</div>
+                    </div>
+                </div>
+                
+                <!-- Applications Denied -->
+                <div id="postpaid-denied-summary" class="custom-report futuristic-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2>No. of Applications Denied</h2>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#postpaid-denied-content" aria-expanded="false" aria-controls="postpaid-denied-content">
+                            VIEW DATA
+                        </button>
+                    </div>
+                    <div id="postpaid-denied-content" class="collapse mt-3">
+                        <div class="text-center p-3 text-secondary">Loading Denied Applications Data...</div>
+                    </div>
+                </div>
+
+                <!-- Applications Installed -->
+                <div id="postpaid-installed-summary" class="custom-report futuristic-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2>No. of Applications Installed</h2>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#postpaid-installed-content" aria-expanded="false" aria-controls="postpaid-installed-content">
+                            VIEW DATA
+                        </button>
+                    </div>
+                    <div id="postpaid-installed-content" class="collapse mt-3">
+                        <div class="text-center p-3 text-secondary">Loading Installed Applications Data...</div>
+                    </div>
+                </div>
+
+                <!-- Applications for Installation -->
+                <div id="postpaid-forinstall-summary" class="custom-report futuristic-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2>No. of Applications for Installation</h2>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#postpaid-forinstall-content" aria-expanded="false" aria-controls="postpaid-forinstall-content">
+                            VIEW DATA
+                        </button>
+                    </div>
+                    <div id="postpaid-forinstall-content" class="collapse mt-3">
+                        <div class="text-center p-3 text-secondary">Loading Installation Queue Data...</div>
+                    </div>
+                </div>
+
+                <!-- Applications for Approval (NEWLY ADDED AND CORRECTED BLOCK) -->
+                <div id="postpaid-forapproval-summary" class="custom-report futuristic-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2>No. of Applications for Approval</h2>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#postpaid-forapproval-content" aria-expanded="false" aria-controls="postpaid-forapproval-content">
+                            VIEW DATA
+                        </button>
+                    </div>
+                    <div id="postpaid-forapproval-content" class="collapse mt-3">
+                        <div class="text-center p-3 text-secondary">Loading Approval Queue Data...</div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <!-- ============================================== -->
+            <!-- 3. WOWFI PRO PREPAID SECTION                   -->
+            <!-- ============================================== -->
+            <div id="wowfipro-view" class="view-section" style="display:none;">
+                <h1 class="text-center fw-bold mb-5 gold-accent">WowFi Pro Prepaid Monitoring</h1>
+                
+                <!-- No. of Sold -->
+                <div id="wowfi-sold-summary" class="custom-report futuristic-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2>No. of Sold</h2>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#wowfi-sold-content" aria-expanded="false" aria-controls="wowfi-sold-content">
+                            VIEW DATA
+                        </button>
+                    </div>
+                    <div id="wowfi-sold-content" class="collapse mt-3">
+                        <div class="text-center p-3 text-secondary">Loading Sold Count Data...</div>
+                    </div>
+                </div>
+
+                <!-- No. of Activated -->
+                <div id="wowfi-activated-summary" class="custom-report futuristic-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2>No. of Activated</h2>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#wowfi-activated-content" aria-expanded="false" aria-controls="wowfi-activated-content">
+                            VIEW DATA
+                        </button>
+                    </div>
+                    <div id="wowfi-activated-content" class="collapse mt-3">
+                        <div class="text-center p-3 text-secondary">Loading Activated Count Data...</div>
+                    </div>
+                </div>
+
+                <!-- Visual Chart Sold/Activated per Day -->
+                <div id="wowfi-daily-chart-summary" class="custom-report futuristic-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2>Visual Chart for Sold/Activated per Day</h2>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#wowfi-daily-chart-content" aria-expanded="false" aria-controls="wowfi-daily-chart-content">
+                            VIEW CHART DATA
+                        </button>
+                    </div>
+                    <div id="wowfi-daily-chart-content" class="collapse mt-3">
+                        <div class="text-center p-3 text-secondary">Loading Seller Chart Data...</div>
+                    </div>
+                </div>
+
+                <!-- Visual Chart Sold/Activated per Seller -->
+                <div id="wowfi-seller-chart-summary" class="custom-report futuristic-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2>Visual Chart for Sold/Activated per Seller</h2>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#wowfi-seller-chart-content" aria-expanded="false" aria-controls="wowfi-seller-chart-content">
+                            VIEW CHART DATA
+                        </button>
+                    </div>
+                    <div id="wowfi-seller-chart-content" class="collapse mt-3">
+                        <div class="text-center p-3 text-secondary">Loading Seller Chart Data...</div>
+                    </div>
+                </div>
+
+            </div>
+            
+            <!-- ============================================== -->
+            <!-- 4. SIM SOLD SECTION                            -->
+            <!-- ============================================== -->
+            <div id="simsold-view" class="view-section" style="display:none;">
+                <h1 class="text-center fw-bold mb-5 gold-accent">SIM Sold Monitoring</h1>
+                
+                <!-- No. of Sold -->
+                <div id="simsold-sold-summary" class="custom-report futuristic-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2>No. of Sold</h2>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#simsold-sold-content" aria-expanded="false" aria-controls="simsold-sold-content">
+                            VIEW DATA
+                        </button>
+                    </div>
+                    <div id="simsold-sold-content" class="collapse mt-3">
+                        <div class="text-center p-3 text-secondary">Loading Sold Count Data...</div>
+                    </div>
+                </div>
+
+                <!-- No. of Activated -->
+                <div id="simsold-activated-summary" class="custom-report futuristic-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2>No. of Activated</h2>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#simsold-activated-content" aria-expanded="false" aria-controls="simsold-activated-content">
+                            VIEW DATA
+                        </button>
+                    </div>
+                    <div id="simsold-activated-content" class="collapse mt-3">
+                        <div class="text-center p-3 text-secondary">Loading Activated Count Data...</div>
+                    </div>
+                </div>
+
+                <!-- Visual Chart Sold/Activated per Day -->
+                <div id="simsold-daily-chart-summary" class="custom-report futuristic-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2>Visual Chart for Sold per Day</h2>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#simsold-daily-chart-content" aria-expanded="false" aria-controls="simsold-daily-chart-content">
+                            VIEW CHART DATA
+                        </button>
+                    </div>
+                    <!-- ADDED: Canvas element for the Daily Chart -->
+                    <div id="simsold-daily-chart-content" class="collapse mt-3">
+                        <div class="chart-container">
+                            <canvas id="simSoldDailyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Visual Chart Sold/Activated per Seller -->
+                <div id="simsold-seller-chart-summary" class="custom-report futuristic-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2>Visual Chart for Activated per Seller</h2>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#simsold-seller-chart-content" aria-expanded="false" aria-controls="simsold-seller-chart-content">
+                            VIEW CHART DATA
+                        </button>
+                    </div>
+                    <!-- ADDED: Canvas element for the Seller Chart -->
+                    <div id="simsold-seller-chart-content" class="collapse mt-3">
+                        <div class="chart-container">
+                            <canvas id="simSoldSellerChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Main Container -->
+
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+    <br>
+
+    <footer class="py-3 mt-auto bg-dark">
+        <div class="container">
+            <p class="m-0 text-center text-white-50">Copyright &copy; Elle_Fate@Harold 2021</p>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/js/bootstrap.bundle.min.js" xintegrity="sha384-FKyoEForCGlyvwx9Hj09JcYn3nv7wiPVlz7YYwJrWVcXK/BmnVDxM+D2scQbITxI" crossorigin="anonymous"></script>
+
+    <script>
+        // Global map to hold Chart instances for dynamic destruction and recreation
+        let chartInstances = {}; 
+
+        // !! SECURITY WARNING !!
+        // Exposing your API Key in the frontend is highly insecure.
+        // For a live application, it is best practice to use a Google Apps Script Web App
+        // as a secure proxy to fetch data and protect your key.
+        const API_KEY = 'AIzaSyCoastovR_u1wB8gxkAOn5Esy6OU22ozVY'; 
+        const SPREADSHEET_ID = '10rPB-U5hdtdAkyfZlcmr82Fg_SnV1P8g5nwQ_D-0ABI'; // Your main Spreadsheet ID
+        // UPDATED BASE_URL for the Google Visualization Query Language endpoint
+        const QUERY_URL = 'https://docs.google.com/spreadsheets/d/';
+
+        /**
+         * Fetches data from Google Sheets and renders it as an HTML table.
+         * (Uses the traditional Sheets API for simple data fetching)
+         * @param {string} spreadsheetId - The ID of the spreadsheet.
+         * @param {string} range - The A1 notation range (e.g., 'Sheet1!A1:B10').
+         * @param {string} targetId - The ID of the HTML element to render the table into.
+         * @param {string[] | null} customHeaders - Optional array of custom header names.
+         */
+        async function fetchAndRender(spreadsheetId, range, targetId, customHeaders = null) {
+            const targetElement = document.getElementById(targetId);
+            // Use the original Sheets API for raw table data
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
+            
+            // Show loading state
+            targetElement.innerHTML = '<div class="text-center p-3 text-secondary"><i class="fas fa-spinner fa-spin gold-accent me-2"></i> Loading data from Google Sheets...</div>';
+
+            try {
+                const response = await fetch(url);
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error.message || `HTTP error! Status: ${response.status}`);
+                }
+                
+                const data = await response.json();
+
+                if (!data.values || data.values.length === 0) {
+                    targetElement.innerHTML = '<div class="alert alert-warning">⚠️ No data found for the specified range.</div>';
+                    return;
+                }
+
+                const rows = data.values;
+                let html = '<div class="table-responsive"><table class="table table-dark table-bordered"><thead><tr>';
+                
+                // Determine headers and data rows
+                let headers = [];
+                let dataRows = [];
+
+                if (customHeaders && customHeaders.length > 0) {
+                    // Use custom headers and treat all fetched rows as data
+                    headers = customHeaders;
+                    dataRows = rows;
+                } else {
+                    // Use the first fetched row as header and the rest as data
+                    headers = rows[0];
+                    dataRows = rows.slice(1);
+                }
+                
+                // Render headers
+                headers.forEach(header => html += `<th scope="col">${header}</th>`);
+                html += '</tr></thead><tbody>';
+
+                // Render data rows
+                dataRows.forEach(row => {
+                    html += '<tr>';
+                    // Ensure row has enough cells to match header length for consistent columns
+                    const headerCount = headers.length; // Use the derived headers length
+                    for (let i = 0; i < headerCount; i++) {
+                        const cell = row[i] !== undefined ? row[i] : '';
+                        html += `<td>${cell}</td>`;
+                    }
+                    html += '</tr>';
+                });
+
+                html += '</tbody></table></div>';
+                targetElement.innerHTML = html;
+
+            } catch (error) {
+                targetElement.innerHTML = `<div class="alert alert-danger">❌ Failed to load data. Error: ${error.message}</div>`;
+                console.error(`Error loading ${range} from ${spreadsheetId}:`, error);
+            }
+        }
+        
+        /**
+         * Fetches data for charting and renders a Chart.js visualization.
+         * (Uses the Google Visualization Query Language endpoint for structured/transposed data)
+         * @param {string} spreadsheetId - The ID of the spreadsheet.
+         * @param {string} range - The A1 notation range.
+         * @param {string} canvasId - The ID of the <canvas> element.
+         * @param {{chartTitle: string, dataLabel: string, chartType: string}} config - Chart configuration.
+         */
+        async function fetchAndRenderChart(spreadsheetId, range, canvasId, config) {
+            const chartElement = document.getElementById(canvasId);
+            const parentElement = chartElement.closest('.collapse');
+            
+            // FIX: Using the Google Visualization API endpoint for transposition
+            // tq=SELECT * is the key for automatically transposing single-row data to vertical columns.
+            const url = `${QUERY_URL}${spreadsheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(range.split('!')[0])}&range=${encodeURIComponent(range.split('!')[1])}&tq=SELECT *`;
+            
+            // Clear previous chart and show loading state
+            if (chartInstances[canvasId]) {
+                chartInstances[canvasId].destroy();
+                delete chartInstances[canvasId];
+            }
+            // Add a temporary loading indicator before fetching
+            parentElement.innerHTML = '<div class="chart-container text-center p-3 text-secondary"><i class="fas fa-spinner fa-spin gold-accent me-2"></i> Loading chart data...</div>';
+
+            try {
+                const response = await fetch(url);
+                const text = await response.text();
+                
+                // Extract JSON part from the response text (it comes wrapped in a callback function)
+                const jsonText = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
+                const queryData = JSON.parse(jsonText);
+
+                const table = queryData.table;
+                
+                if (!table || !table.rows || table.rows.length === 0) {
+                    parentElement.innerHTML = '<div class="chart-container alert alert-warning">⚠️ No data found for chart rendering. Check your spreadsheet range.</div>';
+                    return;
+                }
+
+                // Data extraction from GQL format:
+                // Labels are in the first row (if transposed, this is the first item's formatted value).
+                // Values are in the second column (c[1] index).
+                
+                const labels = [];
+                const values = [];
+
+                // The GQL response structure is complex. We assume transposed single-row data
+                // Column 0 contains the column headers/labels from the original horizontal range
+                // Column 1 contains the values (the actual data)
+                
+                // If fetching a single column (e.g., C22:C) this loops over rows.
+                // If fetching a single row (e.g., C22:AI22) this loops over columns, giving us the vertical structure.
+                table.rows.forEach(row => {
+                    // Row is an object {c: [{v: value, f: formatted_value}, {v: value, f: formatted_value}, ...]}
+                    if (row.c.length >= 2) {
+                        // Assuming Column 0 is the label and Column 1 is the value after transposition
+                        // We use the formatted value (f) for labels (like dates/names) and value (v) for numbers
+                        labels.push(row.c[0] ? (row.c[0].f || row.c[0].v) : 'N/A');
+                        values.push(row.c[1] ? parseFloat(row.c[1].v) : 0);
+                    }
+                });
+
+                // Since the query returns transposed data, we discard the header row if present, but since
+                // we are using 'SELECT *' and we are expecting a horizontal fetch, the transposition should
+                // make the data usable as is. We check for empty data.
+                if (labels.length === 0 || values.length === 0) {
+                    parentElement.innerHTML = '<div class="chart-container alert alert-warning">⚠️ Chart data processing failed. Please ensure the range is a single row or column of numbers/labels.</div>';
+                    return;
+                }
+
+                // Restore canvas element for Chart.js
+                parentElement.innerHTML = `<div class="chart-container"><canvas id="${canvasId}"></canvas></div>`;
+                const ctx = document.getElementById(canvasId).getContext('2d');
+                
+                chartInstances[canvasId] = new Chart(ctx, {
+                    type: config.chartType, // 'bar' or 'line'
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: config.dataLabel,
+                            data: values,
+                            backgroundColor: config.chartType === 'bar' ? 'rgba(255, 215, 0, 0.7)' : 'rgba(79, 70, 229, 0.7)', 
+                            borderColor: config.chartType === 'bar' ? '#FFD700' : '#4F46E5',
+                            borderWidth: 2,
+                            // Use fill for line charts, borderRadius for bar charts
+                            fill: config.chartType === 'line' ? true : false,
+                            tension: 0.4,
+                            borderRadius: config.chartType === 'bar' ? 5 : 0,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { 
+                                labels: { 
+                                    color: '#FFD700', 
+                                    font: { family: 'Orbitron' } 
+                                } 
+                            },
+                            title: {
+                                display: true,
+                                text: config.chartTitle,
+                                color: '#EC4899',
+                                font: { family: 'Orbitron', size: 18 }
+                            },
+                        },
+                        scales: {
+                            y: { 
+                                beginAtZero: true,
+                                ticks: { color: 'white', font: { family: 'Orbitron' } },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' } 
+                            },
+                            x: { 
+                                ticks: { color: 'white', font: { family: 'Orbitron' } },
+                                grid: { color: 'rgba(255, 255, 255, 0.1)' } 
+                            }
+                        }
+                    }
+                });
+
+            } catch (error) {
+                parentElement.innerHTML = `<div class="chart-container alert alert-danger">❌ Failed to render chart. Error: ${error.message}</div>`;
+                console.error(`Error loading chart data from ${range}:`, error);
+            }
+        }
+
+
+        // --- View Switching Logic (for single-page navigation) ---
+        function switchView(viewId) {
+            document.querySelectorAll('.view-section').forEach(section => {
+                section.style.display = 'none';
+            });
+            
+            // Determine the target view ID
+            let targetId;
+            if (viewId === 'home') {
+                targetId = 'home-view';
+            } else {
+                targetId = `${viewId}-view`;
+            }
+
+            const targetElement = document.getElementById(targetId);
+            if (targetElement) {
+                targetElement.style.display = 'block';
+            }
+        }
+
+        // --- Bootstrap Collapse Event Listeners for Dynamic Data Loading ---
+        // Listener function helper
+        function setupCollapseListener(contentId, range, config = {}) {
+            document.getElementById(contentId).addEventListener('show.bs.collapse', function () {
+                // Check if content already exists to prevent repeated API calls/rendering
+                if (this.querySelector('.table-responsive') === null && this.querySelector('.chart-container') === null) {
+                    if (config.type === 'chart') {
+                        // For chart rendering, call the specific chart function
+                        fetchAndRenderChart(
+                            SPREADSHEET_ID,
+                            range,
+                            config.canvasId,
+                            config
+                        );
+                    } else {
+                        // For table rendering, call the standard fetch function
+                        fetchAndRender(
+                            SPREADSHEET_ID,
+                            range,
+                            contentId,
+                            config.customHeaders
+                        );
+                    }
+                }
+            });
+            // Cleanup on hide
+            document.getElementById(contentId).addEventListener('hide.bs.collapse', function () {
+                if (config.type === 'chart' && chartInstances[config.canvasId]) {
+                    chartInstances[config.canvasId].destroy();
+                    delete chartInstances[config.canvasId];
+                }
+            });
+        }
+
+        // 1. MANDAYS REPORTS
+        setupCollapseListener('mandays-content', 'FSF Monitoring/Report!F2:H3'); // EDITABLE: Mandays Monitoring Range
+        setupCollapseListener('seller-content', 'September 16 to 30, 2025!C6:V26'); // EDITABLE: Seller Attendance Range
+
+        // 2. POSTPAID REPORTS
+        setupCollapseListener('postpaid-submitted-content', 'Sheet2!U16:W16', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITED: Custom Headers and Data-Only Range
+        setupCollapseListener('postpaid-approved-content', 'Sheet2!U17:W17', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: Applications Approved Range
+        setupCollapseListener('postpaid-denied-content', 'Sheet2!U21:W21', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: Applications Denied Range
+        setupCollapseListener('postpaid-installed-content', 'Sheet2!U18:W18', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: Applications Installed Range
+        setupCollapseListener('postpaid-forinstall-content', 'Sheet2!U19:W19', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: Applications for Installation Range
+        setupCollapseListener('postpaid-forapproval-content', 'Sheet2!U20:W20', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: Applications for Approval Range
+
+
+        // 3. WOWFI PRO PREPAID REPORTS
+        setupCollapseListener('wowfi-sold-content', 'WowFi_Sold_Count!A1:B1'); // EDITABLE: No. of Sold Range
+        setupCollapseListener('wowfi-activated-content', 'WowFi_Activated_Count!A1:B1'); // EDITABLE: No. of Activated Range
+        setupCollapseListener('wowfi-daily-chart-content', 'WowFi_Daily_Chart!A1:C10'); // EDITABLE: Daily Chart Data Range
+        setupCollapseListener('wowfi-seller-chart-content', 'WowFi_Seller_Chart!A1:C10'); // EDITABLE: Seller Chart Data Range
+
+        // 4. SIM SOLD REPORTS
+        setupCollapseListener('simsold-sold-content', 'Sheet2!U24:W24', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: No. of Sold Range
+        setupCollapseListener('simsold-activated-content', 'Sheet2!U25:W25', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: No. of Activated Range
+        
+        // --- SIM Sold Charts ---
+        // Visual Chart for Sold per Day (Line Chart for Time Series Data)
+        // FIX: The query now uses the Google Visualization endpoint to transpose the single-row data (C22:AI22)
+        setupCollapseListener('simsold-daily-chart-content', 'chartdataFSF Monitoring/Report!C22:AI22', { 
+            type: 'chart', 
+            canvasId: 'simSoldDailyChart', 
+            chartTitle: 'SIM Sold Performance per Day', 
+            dataLabel: 'Sold Units', 
+            chartType: 'line' 
+        }); 
+        
+        // Visual Chart for Activated per Seller (Bar Chart for Categorical Data)
+        setupCollapseListener('simsold-seller-chart-content', 'Sheet2!D1:E10', { 
+            type: 'chart', 
+            canvasId: 'simSoldSellerChart', 
+            chartTitle: 'SIM Activated Performance per Seller', 
+            dataLabel: 'Activated Units', 
+            chartType: 'bar' 
+        });
+
+
+        // Initialize to show Home view on load
+        document.addEventListener('DOMContentLoaded', () => {
+            switchView('home'); // Load the new grid view first
+        });
+    </script>
+</body>
+</html>
