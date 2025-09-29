@@ -224,7 +224,7 @@
     <!-- Start Navigation -->
     <nav class="navbar fixed-top navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand gold-accent" href="#">FSF Dashboard by: Elle</a>
+            <a class="navbar-brand gold-accent" href="#">FSF Dashboard by Elle</a>
             <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -241,7 +241,7 @@
                     <!-- Mandays -->
                     <li class="nav-item">
                         <a class="nav-link" href="#" onclick="switchView('mandays')">
-                            <i class="fas fa-calendar-alt gold-accent"></i> Mandays
+                            <i class="fas fa-calendar-alt gold-accent"></i> Manpower Monitoring
                         </a>
                     </li>
                     <!-- Postpaid Monitoring -->
@@ -599,9 +599,6 @@
     </div>
     <!-- End Modal -->
 
-    <br>
-    <br>
-
     <footer class="py-3 mt-auto bg-dark">
         <div class="container">
             <p class="m-0 text-center text-white-50">
@@ -664,13 +661,13 @@ Use of these materials by clients and stakeholders is permitted solely for inter
             const periods = ATTENDANCE_CONFIG[key];
             
             if (periods) {
-                // FIX: Check for the special 'Total Manpower Days' call where day is 0
+                // Check for the special 'Total Manpower Days' call where day is 0 (handled by fetchTotalSellersDeployed)
                 if (day === 0) { 
                     // Return the entire periods array for fetching all sheets in the month (for totals/charts)
-                    // This resolves the 'Configuration Error' for the Total Manpower Days button.
                     return { periods: periods, sheet: 'Combined Month', range: 'N/A' };
                 }
 
+                // FIX: Added logic to handle dates falling exactly on the endDay correctly
                 const config = periods.find(p => day <= p.endDay);
                 
                 if (config) {
@@ -812,14 +809,22 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                             }
                         }
                         
-                        // Ensure Team Leaders and Sellers are tracked separately if their names overlap, though we just aggregate here
-                        sellerTotalsMap[fullName] = (sellerTotalsMap[fullName] || 0) + totalCount;
+                        // Aggregate totals for the seller
+                        // FIX: Store seller totals as an object { total: T, period1: P1, period2: P2 }
+                        if (!sellerTotalsMap[fullName]) {
+                             sellerTotalsMap[fullName] = { 
+                                total: 0, 
+                                attendance: {} 
+                            };
+                        }
+                        sellerTotalsMap[fullName].total += totalCount;
+                        sellerTotalsMap[fullName].attendance[period.sheet] = totalCount;
                     });
                 }
                 
-                // 3. Prepare data for list and sort by attendance days (highest first)
+                // 3. Prepare data for list and sort by total days (highest first)
                 let finalSellerList = Object.entries(sellerTotalsMap)
-                    .map(([name, totalDays]) => ({ name, totalDays }))
+                    .map(([name, data]) => ({ name, totalDays: data.total, attendance: data.attendance }))
                     .sort((a, b) => b.totalDays - a.totalDays);
 
                 if (finalSellerList.length === 0) {
@@ -830,10 +835,23 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                 // 4. Render the list
                 let listHtml = '<ul class="list-group attendance-summary-list">';
                 finalSellerList.forEach(seller => {
+                    const period1Days = seller.attendance[periods[0].sheet] || 0;
+                    const period2Days = (periods.length > 1 ? seller.attendance[periods[1].sheet] : 0) || 0;
+
+                    // Dynamically generate the details for the two periods
+                    // FIX: Applying gold and silver colors to the period labels
+                    let periodDetailsHtml = `<span class="fw-bold me-3" style="color: #FFD700;">P1: ${period1Days} Days</span>`; // Gold
+                    if (periods.length > 1) {
+                         periodDetailsHtml += `<span class="fw-bold" style="color: #C0C0C0;">P2: ${period2Days} Days</span>`; // Silver
+                    }
+                    
                     listHtml += `
                         <li class="list-group-item">
-                            <span class="fw-bold text-white">${seller.name}</span>
-                            <span class="badge bg-success p-2">${seller.totalDays} Days</span>
+                            <div class="d-flex flex-column align-items-start">
+                                <span class="fw-bold text-white">${seller.name}</span>
+                                <div class="text-xs mt-1">${periodDetailsHtml}</div>
+                            </div>
+                            <span class="badge bg-success p-2 fs-6">${seller.totalDays} Total Days</span>
                         </li>
                     `;
                 });
@@ -852,8 +870,6 @@ Use of these materials by clients and stakeholders is permitted solely for inter
         /**
          * Fetches data for charting and renders a Chart.js visualization.
          * ... (fetchAndRenderChart function remains the same) ...
-         * NOTE: This function is preserved for non-attendance charts but the 
-         * Attendance Per Seller Chart listener is now removed below.
          */
         async function fetchAndRenderChart(spreadsheetId, range, canvasId, config) {
             const chartElement = document.getElementById(canvasId);
@@ -1008,7 +1024,7 @@ Use of these materials by clients and stakeholders is permitted solely for inter
             const periods = ATTENDANCE_CONFIG[key];
             
             if (!periods) {
-                const monthYear = date.toLocaleDateDateString('en-US', { month: 'long', year: 'numeric' });
+                const monthYear = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
                 const errorDiv = document.createElement('div');
                 errorDiv.className = 'alert alert-danger';
                 errorDiv.innerHTML = `❌ **Configuration Error:** No sheet periods defined for ${monthYear}. Please check **ATTENDANCE_CONFIG**.`;
@@ -1035,8 +1051,16 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                 let totalTLAttendance = 0;
                 let totalSellerAttendance = 0;
                 
+                // NEW: Period specific totals
+                let tlAttendancePeriod1 = 0;
+                let sellerAttendancePeriod1 = 0;
+                let tlAttendancePeriod2 = 0;
+                let sellerAttendancePeriod2 = 0;
+
+
                 // Fetch and process data for ALL periods defined in the current month
-                for (const period of periods) {
+                for (let pIndex = 0; pIndex < periods.length; pIndex++) {
+                    const period = periods[pIndex];
                     const range = `${period.sheet}!${period.range}`;
                     const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
                     
@@ -1072,8 +1096,15 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                             if (isPresent) {
                                 if (designation.includes('TEAM LEADER') || designation.includes('TL')) {
                                     totalTLAttendance++;
+                                    // Store period-specific total
+                                    if (pIndex === 0) tlAttendancePeriod1++;
+                                    if (pIndex === 1) tlAttendancePeriod2++;
+
                                 } else if (designation.includes('SELLER')) {
                                     totalSellerAttendance++;
+                                    // Store period-specific total
+                                    if (pIndex === 0) sellerAttendancePeriod1++;
+                                    if (pIndex === 1) sellerAttendancePeriod2++;
                                 }
                             }
                         }
@@ -1081,14 +1112,24 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                 }
                 
                 const totalManpowerDays = totalTLAttendance + totalSellerAttendance;
+                
+                // Retrieve period names safely
+                const period1Name = periods[0] ? periods[0].sheet : 'P1 (Missing)';
+                const period2Name = periods[1] ? periods[1].sheet : 'P2 (Missing)';
 
                 modalBody.innerHTML = `
                     <div class="text-center p-5">
                         <h1 class="gold-accent display-4 fw-bold">${totalManpowerDays}</h1>
                         <p class="text-white-50 fs-5">Total Manpower Days (Present Days) deployed during this period.</p>
                         <hr class="border-secondary my-3">
-                        <p class="text-white fs-6 mb-1">Team Leader Attendance: <span class="fw-bold text-success">${totalTLAttendance} Days</span></p>
-                        <p class="text-white fs-6">Sellers Attendance: <span class="fw-bold text-success">${totalSellerAttendance} Days</span></p>
+                        
+                        <h4 class="text-white fw-bold mb-3">Team Leader Totals</h4>
+                        <p class="text-white fs-6 mb-1">${period1Name}: <span class="fw-bold text-success">${tlAttendancePeriod1} Days</span></p>
+                        <p class="text-white fs-6 mb-4">${period2Name}: <span class="fw-bold text-success">${tlAttendancePeriod2} Days</span></p>
+
+                        <h4 class="text-white fw-bold mb-3">Seller Totals</h4>
+                        <p class="text-white fs-6 mb-1">${period1Name}: <span class="fw-bold text-success">${sellerAttendancePeriod1} Days</span></p>
+                        <p class="text-white fs-6">${period2Name}: <span class="fw-bold text-success">${sellerAttendancePeriod2} Days</span></p>
                     </div>
                 `;
 
@@ -1458,7 +1499,13 @@ Use of these materials by clients and stakeholders is permitted solely for inter
         // --- Bootstrap Collapse Event Listeners for Dynamic Data Loading ---
         // Listener function helper
         function setupCollapseListener(contentId, range, config = {}) {
-            document.getElementById(contentId).addEventListener('show.bs.collapse', function () {
+            const element = document.getElementById(contentId);
+            if (!element) {
+                // console.warn(`Element with ID ${contentId} not found. Skipping listener setup.`);
+                return; // Safely exit if the element is null
+            }
+
+            element.addEventListener('show.bs.collapse', function () {
                 // Check if content already exists to prevent repeated API calls/rendering
                 if (this.querySelector('.table-responsive') === null && this.querySelector('.chart-container') === null && config.type !== 'calendar') {
                     if (config.type === 'chart') {
@@ -1488,7 +1535,7 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                 }
             });
             // Cleanup on hide
-            document.getElementById(contentId).addEventListener('hide.bs.collapse', function () {
+            element.addEventListener('hide.bs.collapse', function () {
                 if (config.type === 'chart' && chartInstances[config.canvasId]) {
                     chartInstances[config.canvasId].destroy();
                     delete chartInstances[config.canvasId];
@@ -1496,72 +1543,84 @@ Use of these materials by clients and stakeholders is permitted solely for inter
             });
         }
 
-        // 1. MANDAYS REPORTS
-        // We keep the listener here, but the primary rendering is now in switchView for reliability.
-        setupCollapseListener('seller-content', '', { type: 'calendar' }); 
+        function initializeListeners() {
+            // 1. MANDAYS REPORTS
+            // We keep the listener here, but the primary rendering is now in switchView for reliability.
+            setupCollapseListener('seller-content', '', { type: 'calendar' }); 
 
-        // New Chart Listener: Attendance Per Seller Chart
-        // FIX: The type is changed from 'chart' to 'attendance_list' and the canvas ID is removed.
-        setupCollapseListener('attendance-seller-chart-content', '', {
-            type: 'attendance_list',
-            // canvasId is no longer needed
-        });
+            // New Chart Listener: Attendance Per Seller Chart
+            // FIX: The type is changed from 'chart' to 'attendance_list' and the canvas ID is removed.
+            setupCollapseListener('attendance-seller-chart-content', '', {
+                type: 'attendance_list',
+                // canvasId is no longer needed
+            });
 
-        // 2. POSTPAID REPORTS
-        setupCollapseListener('postpaid-submitted-content', 'Sheet2!U16:W16', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITED: Custom Headers and Data-Only Range
-        setupCollapseListener('postpaid-approved-content', 'Sheet2!U17:W17', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: Applications Approved Range
-        setupCollapseListener('postpaid-denied-content', 'Sheet2!U21:W21', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: Applications Denied Range
-        setupCollapseListener('postpaid-installed-content', 'Sheet2!U18:W18', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: Applications Installed Range
-        setupCollapseListener('postpaid-forinstall-content', 'Sheet2!U19:W19', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: Applications for Installation Range
-        setupCollapseListener('postpaid-forapproval-content', 'Sheet2!U20:W20', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: Applications for Approval Range
-
-
-        // 3. WOWFI PRO PREPAID REPORTS
-        setupCollapseListener('wowfi-sold-content', 'WowFi_Sold_Count!A1:B1'); // EDITABLE: No. of Sold Range
-        setupCollapseListener('wowfi-activated-content', 'WowFi_Activated_Count!A1:B1'); // EDITABLE: No. of Activated Range
-        setupCollapseListener('wowfi-daily-chart-content', 'WowFi_Daily_Chart!A1:C10'); // EDITABLE: Daily Chart Data Range
-        setupCollapseListener('wowfi-seller-chart-content', 'WowFi_Seller_Chart!A1:C10'); // EDITABLE: Seller Chart Data Range
-
-        // 4. SIM SOLD REPORTS
-        setupCollapseListener('simsold-sold-content', 'Sheet2!U24:W24', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: No. of Sold Range
-        setupCollapseListener('simsold-activated-content', 'Sheet2!U25:W25', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: No. of Activated Range
-        
-        // --- SIM Sold Charts ---
-        // 4A. Visual Chart for Sold per Day (Line Chart for Time Series Data)
-        setupCollapseListener('simsold-daily-chart-content', 'FSF Monitoring/Report!C3:AI17', { 
-            type: 'chart', 
-            canvasId: 'simSoldDailyChart', 
-            chartTitle: 'SIM Sold Performance per Day (Total Sales)', 
-            dataLabel: 'Sold Units', 
-            chartType: 'line',
-            processingMode: 'daily_total' // New mode for column sums
-        }); 
-        
-        // 4B. Visual Chart for Total Sold per Seller (Bar Chart for Categorical Data)
-        setupCollapseListener('simsold-seller-total-chart-content', 'FSF Monitoring/Report!C3:AI17', { 
-            type: 'chart', 
-            canvasId: 'simSoldSellerTotalChart', 
-            chartTitle: 'Total SIM Sold per Seller (All Dates)', 
-            dataLabel: 'Total Sold Units', 
-            chartType: 'bar',
-            processingMode: 'seller_total' // New mode for row sums
-        });
-
-        // 4C. Visual Chart for Activated per Seller (Original Block)
-        setupCollapseListener('simsold-seller-chart-content', 'Sheet2!D1:E10', { 
-            type: 'chart', 
-            canvasId: 'simSoldSellerChart', 
-            chartTitle: 'SIM Activated Performance per Seller', 
-            dataLabel: 'Activated Units', 
-            chartType: 'bar' 
-        });
+            // 2. POSTPAID REPORTS
+            setupCollapseListener('postpaid-submitted-content', 'Sheet2!U16:W16', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITED: Custom Headers and Data-Only Range
+            setupCollapseListener('postpaid-approved-content', 'Sheet2!U17:W17', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: Applications Approved Range
+            setupCollapseListener('postpaid-denied-content', 'Sheet2!U21:W21', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: Applications Denied Range
+            setupCollapseListener('postpaid-installed-content', 'Sheet2!U18:W18', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: Applications Installed Range
+            setupCollapseListener('postpaid-forinstall-content', 'Sheet2!U19:W19', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: Applications for Installation Range
+            setupCollapseListener('postpaid-forapproval-content', 'Sheet2!U20:W20', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: Applications for Approval Range
 
 
-        // Initialize to show Home view on load
+            // 3. WOWFI PRO PREPAID REPORTS
+            // FIX: These elements exist within the collapsed wowfipro-view, but their immediate parent elements do not exist yet when the script first runs.
+            // However, since they are children of wowfipro-view, we check if the view is available before accessing the child elements.
+            const wowFiView = document.getElementById('wowfipro-view');
+            if (wowFiView) {
+                // If the container exists, we assume the children exist or will be accessed safely when expanded.
+                setupCollapseListener('wowfi-sold-content', 'WowFi_Sold_Count!A1:B1'); // EDITABLE: No. of Sold Range
+                setupCollapseListener('wowfi-activated-content', 'WowFi_Activated_Count!A1:B1'); // EDITABLE: No. of Activated Range
+                setupCollapseListener('wowfi-daily-chart-content', 'WowFi_Daily_Chart!A1:C10'); // EDITABLE: Daily Chart Data Range
+                setupCollapseListener('wowfi-seller-chart-content', 'WowFi_Seller_Chart!A1:C10'); // EDITABLE: Seller Chart Data Range
+            }
+
+
+            // 4. SIM SOLD REPORTS
+             const simSoldView = document.getElementById('simsold-view');
+             if (simSoldView) {
+                setupCollapseListener('simsold-sold-content', 'Sheet2!U24:W24', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: No. of Sold Range
+                setupCollapseListener('simsold-activated-content', 'Sheet2!U25:W25', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: No. of Activated Range
+                
+                // --- SIM Sold Charts ---
+                // 4A. Visual Chart for Sold per Day (Line Chart for Time Series Data)
+                setupCollapseListener('simsold-daily-chart-content', 'FSF Monitoring/Report!C3:AI17', { 
+                    type: 'chart', 
+                    canvasId: 'simSoldDailyChart', 
+                    chartTitle: 'SIM Sold Performance per Day (Total Sales)', 
+                    dataLabel: 'Sold Units', 
+                    chartType: 'line',
+                    processingMode: 'daily_total' // New mode for column sums
+                }); 
+                
+                // 4B. Visual Chart for Total Sold per Seller (Bar Chart for Categorical Data)
+                setupCollapseListener('simsold-seller-total-chart-content', 'FSF Monitoring/Report!C3:AI17', { 
+                    type: 'chart', 
+                    canvasId: 'simSoldSellerTotalChart', 
+                    chartTitle: 'Total SIM Sold per Seller (All Dates)', 
+                    dataLabel: 'Total Sold Units', 
+                    chartType: 'bar',
+                    processingMode: 'seller_total' // New mode for row sums
+                });
+
+                // 4C. Visual Chart for Activated per Seller (Original Block)
+                setupCollapseListener('simsold-seller-chart-content', 'Sheet2!D1:E10', { 
+                    type: 'chart', 
+                    canvasId: 'simSoldSellerChart', 
+                    chartTitle: 'SIM Activated Performance per Seller', 
+                    dataLabel: 'Activated Units', 
+                    chartType: 'bar' 
+                });
+            }
+        }
+
+
+        // Initialize all listeners after the entire HTML structure is loaded.
         document.addEventListener('DOMContentLoaded', () => {
+            initializeListeners();
             switchView('home'); // Load the new grid view first
         });
     </script>
 </body>
 </html>
-
