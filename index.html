@@ -601,7 +601,7 @@
 
     <footer class="py-3 mt-auto bg-dark">
         <div class="container">
-            <p class="m-0 text-center text-white-50">
+            <p class="m-0 text-center text-white-50 text-danger" style="color: red !important;">
 All content, data visualizations, reports, and design elements presented on this website and in associated documents are the intellectual property of Gracelle Anne Magnaye, CCMGI Project Coordinator. These materials are protected under applicable copyright and intellectual property laws.
 Unauthorized reproduction, distribution, modification, or commercial use of any part of these reports—whether in whole or in part—is strictly prohibited without prior written consent. This includes, but is not limited to, copying data structures, UI/UX layouts, dashboard components, and embedded analytics.
 Use of these materials by clients and stakeholders is permitted solely for internal review and decision-making purposes. Any external sharing or publication must be explicitly approved.
@@ -1561,7 +1561,8 @@ Use of these materials by clients and stakeholders is permitted solely for inter
             setupCollapseListener('postpaid-denied-content', 'Sheet2!U21:W21', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: Applications Denied Range
             setupCollapseListener('postpaid-installed-content', 'Sheet2!U18:W18', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: Applications Installed Range
             setupCollapseListener('postpaid-forinstall-content', 'Sheet2!U19:W19', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: Applications for Installation Range
-            setupCollapseListener('postpaid-forapproval-content', 'Sheet2!U20:W20', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: Applications for Approval Range
+            setupCollapseListener('postpaid-forapproval-content', 'Sheet2!U20:W20', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: Applications for Approval T
+            // ... (rest of the listeners are wrapped in initializeListeners and are correct for their respective containers) ...
 
 
             // 3. WOWFI PRO PREPAID REPORTS
