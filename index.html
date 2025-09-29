@@ -114,6 +114,109 @@
             border-radius: 0.5rem;
             padding: 15px;
         }
+        
+        /* Calendar Styles */
+        .calendar-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: #EC4899;
+            color: white;
+            padding: 10px;
+            border-radius: 0.5rem 0.5rem 0 0;
+            font-size: 1.25rem;
+            font-weight: 700;
+        }
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            text-align: center;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 0 0 0.5rem 0.5rem;
+            padding: 10px;
+        }
+        .day-name {
+            font-size: 0.85rem;
+            font-weight: 700;
+            padding: 5px 0;
+            color: #FFD700; /* Gold accent */
+        }
+        .day-cell {
+            padding: 10px 5px;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            border-radius: 0.5rem;
+            font-size: 1.1rem;
+            font-weight: 500;
+        }
+        .day-cell:hover {
+            background-color: rgba(79, 70, 229, 0.8); /* Indigo hover */
+        }
+        .day-cell.inactive {
+            color: rgba(255, 255, 255, 0.3);
+            cursor: default;
+        }
+        .day-cell.inactive:hover {
+            background-color: transparent;
+        }
+        .calendar-nav button {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.5rem;
+            cursor: pointer;
+            padding: 0 10px;
+        }
+
+        /* Modal Styles */
+        .modal-content {
+            background: linear-gradient(135deg, #1f1d47, #3d0a25);
+            border: 2px solid #EC4899;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .modal-header {
+            border-bottom: 1px solid #FFD700;
+        }
+        .modal-title {
+            color: #FFD700;
+            font-weight: 700;
+        }
+        .modal-body {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        .attendance-cell {
+            min-width: 50px;
+            text-align: center;
+            font-size: 0.85rem;
+            padding: 5px;
+        }
+        .status-P { background-color: #38a169; } /* Green */
+        .status-A { background-color: #c53030; } /* Red */
+        .status-L { background-color: #4c51bf; } /* Blue/Late */
+        .status-D { background-color: #dd6b20; } /* Orange/Day Off */
+
+        /* Daily List Styles */
+        .present-seller-list {
+            list-style: none;
+            padding: 0;
+        }
+        .present-seller-list li {
+            padding: 5px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        /* New style for Attendance List */
+        .attendance-summary-list .list-group-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background-color: rgba(255, 255, 255, 0.05);
+            border: none;
+            margin-bottom: 5px;
+            border-radius: 0.5rem;
+            padding: 10px 15px;
+        }
     </style>
 </head>
 <body>
@@ -121,7 +224,7 @@
     <!-- Start Navigation -->
     <nav class="navbar fixed-top navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand gold-accent" href="#">FSF Dashboard by: Elle</a>
+            <a class="navbar-brand gold-accent" href="#">FSF Dashboard</a>
             <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -212,37 +315,38 @@
             </div>
             
             <!-- ============================================== -->
-            <!-- 1. MANDAYS SECTION                             -->
+            <!-- 1. MANDAYS SECTION (NOW ATTENDANCE CALENDAR)   -->
             <!-- ============================================== -->
             <div id="mandays-view" class="view-section" style="display:none;">
-                <h1 class="text-center fw-bold mb-5 gold-accent">Mandays Monitoring</h1>
+                <h1 class="text-center fw-bold mb-5 gold-accent">Attendance Monitoring Calendar</h1>
 
-                <!-- Mandays Summary -->
-                <div id="mandays-summary" class="custom-report futuristic-card mb-4">
+                <!-- Combined Attendance Calendar View -->
+                <div id="attendance-calendar-main" class="custom-report futuristic-card mb-4">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h2>📋 Mandays Monitoring Report</h2>
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#mandays-content" aria-expanded="false" aria-controls="mandays-content">
-                            VIEW MANDAYS
+                        <h2>📅 Click a Date to View Attendance History</h2>
+                        <!-- New button for Total Sellers Deployed -->
+                        <button class="btn btn-sm btn-warning" onclick="fetchTotalSellersDeployed()">
+                            <i class="fas fa-users me-1"></i> Total Manpower Days
                         </button>
                     </div>
-                    <div id="mandays-content" class="collapse mt-3">
-                        <div class="text-center p-3 text-secondary">Loading Mandays Data...</div>
+                    <div id="seller-content" class="collapse mt-3 show">
+                        <div class="text-center p-3 text-secondary">Loading Calendar...</div>
                     </div>
                 </div>
 
-                <!-- Seller Breakdown -->
-                <div id="seller-breakdown" class="custom-report futuristic-card mb-4">
+                <!-- NEW: Attendance Per Seller List (Replaces Chart) -->
+                <div id="attendance-seller-chart-summary" class="custom-report futuristic-card mb-4">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h2>🧑‍💼 Sellers Attendance</h2>
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#seller-content" aria-expanded="false" aria-controls="seller-content">
-                            VIEW ATTENDANCE
+                        <h2>📋 Total Attendance Per Seller</h2>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#attendance-seller-chart-content" aria-expanded="false" aria-controls="attendance-seller-chart-content">
+                            VIEW LIST DATA
                         </button>
                     </div>
-                    <div id="seller-content" class="collapse mt-3">
-                        <div class="text-center p-3 text-secondary">Loading Attendance Data...</div>
+                    <div id="attendance-seller-chart-content" class="collapse mt-3">
+                        <!-- List will be rendered here by renderAttendanceListPerSeller -->
+                        <div class="text-center p-3 text-secondary">Click 'View List Data' to load totals...</div>
                     </div>
                 </div>
-                
             </div>
             
             <!-- ============================================== -->
@@ -423,7 +527,7 @@
                     </div>
                 </div>
 
-                <!-- Visual Chart Sold/Activated per Day -->
+                <!-- Visual Chart Sold per Day -->
                 <div id="simsold-daily-chart-summary" class="custom-report futuristic-card mb-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <h2>Visual Chart for Sold per Day</h2>
@@ -438,8 +542,24 @@
                         </div>
                     </div>
                 </div>
+                
+                <!-- NEW: Visual Chart Total Sold per Seller -->
+                <div id="simsold-seller-total-chart-summary" class="custom-report futuristic-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2>Visual Chart for Total Sold per Seller</h2>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#simsold-seller-total-chart-content" aria-expanded="false" aria-controls="simsold-seller-total-chart-content">
+                            VIEW CHART DATA
+                        </button>
+                    </div>
+                    <!-- ADDED: Canvas element for the Seller Total Chart -->
+                    <div id="simsold-seller-total-chart-content" class="collapse mt-3">
+                        <div class="chart-container">
+                            <canvas id="simSoldSellerTotalChart"></canvas>
+                        </div>
+                    </div>
+                </div>
 
-                <!-- Visual Chart Sold/Activated per Seller -->
+                <!-- Visual Chart Activated per Seller (Original Block) -->
                 <div id="simsold-seller-chart-summary" class="custom-report futuristic-card mb-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <h2>Visual Chart for Activated per Seller</h2>
@@ -459,29 +579,37 @@
     </div>
     <!-- End Main Container -->
 
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
-    <br>
+    <!-- Attendance Details Modal -->
+    <div class="modal fade" id="attendanceModal" tabindex="-1" aria-labelledby="attendanceModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="attendanceModalLabel">Attendance for [Date]</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Dynamic attendance list will be inserted here -->
+                    <div id="attendanceDetailsBody">Loading details...</div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- End Modal -->
+
     <br>
     <br>
 
     <footer class="py-3 mt-auto bg-dark">
         <div class="container">
-            <p class="m-0 text-center text-white-50">Copyright &copy; Elle_Fate@Harold 2021</p>
+            <p class="m-0 text-center text-white-50">
+All content, data visualizations, reports, and design elements presented on this website and in associated documents are the intellectual property of Gracelle Anne Magnaye, CCMGI Project Coordinator. These materials are protected under applicable copyright and intellectual property laws.
+Unauthorized reproduction, distribution, modification, or commercial use of any part of these reports—whether in whole or in part—is strictly prohibited without prior written consent. This includes, but is not limited to, copying data structures, UI/UX layouts, dashboard components, and embedded analytics.
+Use of these materials by clients and stakeholders is permitted solely for internal review and decision-making purposes. Any external sharing or publication must be explicitly approved.
+© 2025 Gracelle Anne Magnaye, CCMGI. All rights reserved.
+            </p>
         </div>
     </footer>
 
@@ -491,6 +619,8 @@
     <script>
         // Global map to hold Chart instances for dynamic destruction and recreation
         let chartInstances = {}; 
+        let attendanceDataCache = null; // Cache for the seller attendance matrix
+        let currentCalendarDate = new Date(); // Tracks the currently displayed month/year
 
         // !! SECURITY WARNING !!
         // Exposing your API Key in the frontend is highly insecure.
@@ -501,13 +631,62 @@
         // UPDATED BASE_URL for the Google Visualization Query Language endpoint
         const QUERY_URL = 'https://docs.google.com/spreadsheets/d/';
 
+        // =========================================================================
+        // NEW: MULTI-SHEET ATTENDANCE CONFIGURATION (EDIT THIS OBJECT)
+        // Map Month/Year (M/YYYY) to the correct Sheet Name and Range.
+        // Format: 'MonthNumber/Year': { sheet: 'SheetName', range: 'A1:Z100' }
+        // The sheet range MUST contain: [Seller First Name, Seller Last Name, Designation, Date 1, Date 2, ...]
+        // =========================================================================
+        const ATTENDANCE_CONFIG = {
+            // FIX: Separated September into two distinct pay periods for multi-range fetching.
+            '9/2025': [
+                { sheet: 'September 1 to 15, 2025', range: 'A6:R18', endDay: 15 }, 
+                { sheet: 'September 16 to 30, 2025', range: 'A6:R27', endDay: 30 } 
+            ],
+            '10/2025': [
+                { sheet: 'October 1 to 15, 2025', range: 'C3:AI17', endDay: 15 },
+                { sheet: 'October 16 to 31, 2025', range: 'C3:AI17', endDay: 31 }
+            ]
+        };
+
+        /**
+         * Looks up the correct sheet and range for the given date.
+         * This function now handles multi-range periods within a single month.
+         * @param {Date} date - The date to check.
+         * @returns {{range: string, sheet: string, periods: Array} | null} 
+         */
+        function getAttendanceRange(date) {
+            const day = date.getDate();
+            const month = date.getMonth() + 1;
+            const year = date.getFullYear();
+            const key = `${month}/${year}`;
+            
+            const periods = ATTENDANCE_CONFIG[key];
+            
+            if (periods) {
+                // FIX: Check for the special 'Total Manpower Days' call where day is 0
+                if (day === 0) { 
+                    // Return the entire periods array for fetching all sheets in the month (for totals/charts)
+                    // This resolves the 'Configuration Error' for the Total Manpower Days button.
+                    return { periods: periods, sheet: 'Combined Month', range: 'N/A' };
+                }
+
+                const config = periods.find(p => day <= p.endDay);
+                
+                if (config) {
+                    // Returns the A1 notation with the sheet name correctly prefixed
+                    return { 
+                        range: `${config.sheet}!${config.range}`,
+                        sheet: config.sheet // Used internally, now hidden from title
+                    };
+                }
+            }
+            return null;
+        }
+        
         /**
          * Fetches data from Google Sheets and renders it as an HTML table.
-         * (Uses the traditional Sheets API for simple data fetching)
-         * @param {string} spreadsheetId - The ID of the spreadsheet.
-         * @param {string} range - The A1 notation range (e.g., 'Sheet1!A1:B10').
-         * @param {string} targetId - The ID of the HTML element to render the table into.
-         * @param {string[] | null} customHeaders - Optional array of custom header names.
+         * ... (fetchAndRender function remains the same) ...
          */
         async function fetchAndRender(spreadsheetId, range, targetId, customHeaders = null) {
             const targetElement = document.getElementById(targetId);
@@ -574,21 +753,114 @@
             }
         }
         
+        // =========================================================================
+        // NEW FUNCTION: RENDER ATTENDANCE LIST PER SELLER (Replaces Chart logic)
+        // =========================================================================
+        async function renderAttendanceListPerSeller(targetId) {
+            const date = currentCalendarDate;
+            const month = date.getMonth() + 1;
+            const year = date.getFullYear();
+            const key = `${month}/${year}`;
+            const targetElement = document.getElementById(targetId);
+
+            const periods = ATTENDANCE_CONFIG[key];
+            
+            if (!periods) {
+                targetElement.innerHTML = `<div class="alert alert-danger">❌ Configuration Error: No sheet periods defined for ${month}/${year}. Please check **ATTENDANCE_CONFIG**.</div>`;
+                return;
+            }
+
+            targetElement.innerHTML = '<div class="text-center p-3 text-secondary"><i class="fas fa-spinner fa-spin gold-accent me-2"></i> Calculating total attendance per seller...</div>';
+
+            try {
+                let sellerTotalsMap = {};
+                
+                // 1. Loop through all periods (sheets) for the current month
+                for (const period of periods) {
+                    const periodRange = `${period.sheet}!${period.range}`;
+                    const periodUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(periodRange)}?key=${API_KEY}`;
+                    
+                    const response = await fetch(periodUrl);
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(`[${period.sheet}] HTTP error: ${errorData.error.message || response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (!data.values || data.values.length < 2) {
+                        console.warn(`Warning: No seller data found for sheet ${period.sheet}`);
+                        continue;
+                    }
+
+                    const [headerRow, ...sellerRows] = data.values;
+                    const dateColumnsStartIndex = 3; 
+                    const dataColumnsEndIndex = headerRow.length; 
+                    
+                    // 2. Aggregate attendance counts per seller
+                    sellerRows.forEach(row => {
+                        const fullName = `${row[0] || ''} ${row[1] || ''}`.trim();
+                        if (!fullName) return; 
+
+                        let totalCount = 0;
+                        
+                        for (let i = dateColumnsStartIndex; i < dataColumnsEndIndex; i++) {
+                            const rawValue = (row[i] || '').trim().toUpperCase();
+                            if (rawValue.includes('PRESENT') || rawValue === 'P') {
+                                totalCount++;
+                            }
+                        }
+                        
+                        // Ensure Team Leaders and Sellers are tracked separately if their names overlap, though we just aggregate here
+                        sellerTotalsMap[fullName] = (sellerTotalsMap[fullName] || 0) + totalCount;
+                    });
+                }
+                
+                // 3. Prepare data for list and sort by attendance days (highest first)
+                let finalSellerList = Object.entries(sellerTotalsMap)
+                    .map(([name, totalDays]) => ({ name, totalDays }))
+                    .sort((a, b) => b.totalDays - a.totalDays);
+
+                if (finalSellerList.length === 0) {
+                    targetElement.innerHTML = '<div class="alert alert-warning">⚠️ No attendance data found for this period.</div>';
+                    return;
+                }
+
+                // 4. Render the list
+                let listHtml = '<ul class="list-group attendance-summary-list">';
+                finalSellerList.forEach(seller => {
+                    listHtml += `
+                        <li class="list-group-item">
+                            <span class="fw-bold text-white">${seller.name}</span>
+                            <span class="badge bg-success p-2">${seller.totalDays} Days</span>
+                        </li>
+                    `;
+                });
+                listHtml += '</ul>';
+
+                targetElement.innerHTML = listHtml;
+
+            } catch (error) {
+                targetElement.innerHTML = `<div class="alert alert-danger">❌ Failed to load list. Error: ${error.message}</div>`;
+                console.error(`Error calculating total attendance per seller:`, error);
+            }
+        }
+        // =========================================================================
+
+        
         /**
          * Fetches data for charting and renders a Chart.js visualization.
-         * (Uses the Google Visualization Query Language endpoint for structured/transposed data)
-         * @param {string} spreadsheetId - The ID of the spreadsheet.
-         * @param {string} range - The A1 notation range.
-         * @param {string} canvasId - The ID of the <canvas> element.
-         * @param {{chartTitle: string, dataLabel: string, chartType: string}} config - Chart configuration.
+         * ... (fetchAndRenderChart function remains the same) ...
+         * NOTE: This function is preserved for non-attendance charts but the 
+         * Attendance Per Seller Chart listener is now removed below.
          */
         async function fetchAndRenderChart(spreadsheetId, range, canvasId, config) {
             const chartElement = document.getElementById(canvasId);
             const parentElement = chartElement.closest('.collapse');
             
-            // FIX: Using the Google Visualization API endpoint for transposition
-            // tq=SELECT * is the key for automatically transposing single-row data to vertical columns.
-            const url = `${QUERY_URL}${spreadsheetId}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(range.split('!')[0])}&range=${encodeURIComponent(range.split('!')[1])}&tq=SELECT *`;
+            // This URL is NOT used for multi-period charts (attendance_total_per_seller) but kept for other modes.
+            const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
             
             // Clear previous chart and show loading state
             if (chartInstances[canvasId]) {
@@ -599,48 +871,70 @@
             parentElement.innerHTML = '<div class="chart-container text-center p-3 text-secondary"><i class="fas fa-spinner fa-spin gold-accent me-2"></i> Loading chart data...</div>';
 
             try {
-                const response = await fetch(url);
-                const text = await response.text();
-                
-                // Extract JSON part from the response text (it comes wrapped in a callback function)
-                const jsonText = text.substring(text.indexOf('{'), text.lastIndexOf('}') + 1);
-                const queryData = JSON.parse(jsonText);
+                let labels = [];
+                let values = [];
+                let isMultiPeriodChart = config.processingMode === 'attendance_total_per_seller';
 
-                const table = queryData.table;
-                
-                if (!table || !table.rows || table.rows.length === 0) {
-                    parentElement.innerHTML = '<div class="chart-container alert alert-warning">⚠️ No data found for chart rendering. Check your spreadsheet range.</div>';
+                if (isMultiPeriodChart) {
+                    // FIX: This section now calls the list renderer instead of charting logic, 
+                    //      but since the listener is removed, this block is technically dead code. 
+                    //      The actual list logic is moved to renderAttendanceListPerSeller.
+                    parentElement.innerHTML = '<div class="alert alert-danger">Error: Chart logic unexpectedly called.</div>';
                     return;
-                }
 
-                // Data extraction from GQL format:
-                // Labels are in the first row (if transposed, this is the first item's formatted value).
-                // Values are in the second column (c[1] index).
-                
-                const labels = [];
-                const values = [];
+                } else if (config.processingMode === 'daily_total') {
+                    // --- MODE 1: DAILY TOTAL (Column Sums) ---
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    
+                    if (!data.values || data.values.length < 2) throw new Error("Insufficient data for single period chart.");
 
-                // The GQL response structure is complex. We assume transposed single-row data
-                // Column 0 contains the column headers/labels from the original horizontal range
-                // Column 1 contains the values (the actual data)
-                
-                // If fetching a single column (e.g., C22:C) this loops over rows.
-                // If fetching a single row (e.g., C22:AI22) this loops over columns, giving us the vertical structure.
-                table.rows.forEach(row => {
-                    // Row is an object {c: [{v: value, f: formatted_value}, {v: value, f: formatted_value}, ...]}
-                    if (row.c.length >= 2) {
-                        // Assuming Column 0 is the label and Column 1 is the value after transposition
-                        // We use the formatted value (f) for labels (like dates/names) and value (v) for numbers
-                        labels.push(row.c[0] ? (row.c[0].f || row.c[0].v) : 'N/A');
-                        values.push(row.c[1] ? parseFloat(row.c[1].v) : 0);
+                    labels = data.values[0].slice(3).filter(label => label.trim() !== '');
+                    const numDays = labels.length;
+                    const dailyTotals = new Array(numDays).fill(0);
+                    
+                    for (let j = 1; j < data.values.length; j++) {
+                        for (let i = 0; i < numDays; i++) {
+                            const saleValue = parseFloat(data.values[j][i + 3]) || 0;
+                            dailyTotals[i] += saleValue;
+                        }
                     }
-                });
+                    values = dailyTotals;
 
-                // Since the query returns transposed data, we discard the header row if present, but since
-                // we are using 'SELECT *' and we are expecting a horizontal fetch, the transposition should
-                // make the data usable as is. We check for empty data.
-                if (labels.length === 0 || values.length === 0) {
-                    parentElement.innerHTML = '<div class="chart-container alert alert-warning">⚠️ Chart data processing failed. Please ensure the range is a single row or column of numbers/labels.</div>';
+                } else if (config.processingMode === 'seller_total') {
+                    // --- MODE 2: SELLER TOTAL (Row Sums - Simple) ---
+                    const response = await fetch(url);
+                    const data = await response.json();
+                    
+                    if (!data.values || data.values.length < 2) throw new Error("Insufficient data for single period chart.");
+                    
+                    let sellerTotalsMap = {};
+                    
+                    for (let j = 1; j < data.values.length; j++) {
+                        const row = data.values[j];
+                        const fullName = `${row[0] || ''} ${row[1] || ''}`.trim();
+                        if (!fullName) continue; 
+
+                        let totalCount = 0;
+                        for (let i = 3; i < row.length; i++) {
+                            const saleValue = parseFloat(row[i]) || 0;
+                            totalCount += saleValue;
+                        }
+                        sellerTotalsMap[fullName] = (sellerTotalsMap[fullName] || 0) + totalCount;
+                    }
+                    labels = Object.keys(sellerTotalsMap);
+                    values = Object.values(sellerTotalsMap);
+
+                } else {
+                    // --- Default Simple Column Pull (Labels Col 1, Values Col 2) ---
+                     const response = await fetch(url);
+                    const data = await response.json();
+                    labels = data.values.slice(1).map(row => row[0] || 'N/A');
+                    values = data.values.slice(1).map(row => parseFloat(row[1]) || 0);
+                }
+                
+                if (values.length === 0 || values.every(val => val === 0)) {
+                    parentElement.innerHTML = '<div class="chart-container alert alert-warning">⚠️ Chart data calculation failed or all values are zero.</div>';
                     return;
                 }
 
@@ -651,10 +945,10 @@
                 chartInstances[canvasId] = new Chart(ctx, {
                     type: config.chartType, // 'bar' or 'line'
                     data: {
-                        labels: labels,
+                        labels: labels, 
                         datasets: [{
                             label: config.dataLabel,
-                            data: values,
+                            data: values, 
                             backgroundColor: config.chartType === 'bar' ? 'rgba(255, 215, 0, 0.7)' : 'rgba(79, 70, 229, 0.7)', 
                             borderColor: config.chartType === 'bar' ? '#FFD700' : '#4F46E5',
                             borderWidth: 2,
@@ -697,7 +991,435 @@
 
             } catch (error) {
                 parentElement.innerHTML = `<div class="chart-container alert alert-danger">❌ Failed to render chart. Error: ${error.message}</div>`;
-                console.error(`Error loading chart data from ${range}:`, error);
+                console.error(`Error loading chart data from range:`, error);
+            }
+        }
+        
+        /**
+         * Fetches and displays the Total Sellers Deployed (Total Unique Present Sellers) for the month.
+         */
+        async function fetchTotalSellersDeployed() {
+            const date = currentCalendarDate;
+            const month = date.getMonth() + 1;
+            const year = date.getFullYear();
+            const key = `${month}/${year}`;
+            
+            // Directly check ATTENDANCE_CONFIG for the month key
+            const periods = ATTENDANCE_CONFIG[key];
+            
+            if (!periods) {
+                const monthYear = date.toLocaleDateDateString('en-US', { month: 'long', year: 'numeric' });
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'alert alert-danger';
+                errorDiv.innerHTML = `❌ **Configuration Error:** No sheet periods defined for ${monthYear}. Please check **ATTENDANCE_CONFIG**.`;
+                
+                const totalSellersDeployedModal = new bootstrap.Modal(document.getElementById('attendanceModal'));
+                const modalTitle = document.getElementById('attendanceModalLabel');
+                const modalBody = document.getElementById('attendanceDetailsBody');
+                modalTitle.textContent = `Error Loading Totals`;
+                modalBody.innerHTML = ''; // Clear loading spinner
+                modalBody.appendChild(errorDiv);
+                totalSellersDeployedModal.show();
+                return;
+            }
+            
+            const totalSellersDeployedModal = new bootstrap.Modal(document.getElementById('attendanceModal'));
+            const modalBody = document.getElementById('attendanceDetailsBody');
+            const modalTitle = document.getElementById('attendanceModalLabel');
+
+            modalTitle.textContent = `Total Attendance (Manpower Days) - ${date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
+            modalBody.innerHTML = '<div class="text-center p-3 text-secondary"><i class="fas fa-spinner fa-spin gold-accent me-2"></i> Calculating total present days...</div>';
+            totalSellersDeployedModal.show();
+
+            try {
+                let totalTLAttendance = 0;
+                let totalSellerAttendance = 0;
+                
+                // Fetch and process data for ALL periods defined in the current month
+                for (const period of periods) {
+                    const range = `${period.sheet}!${period.range}`;
+                    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
+                    
+                    const response = await fetch(url);
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(`[${period.sheet}] HTTP error: ${errorData.error.message || response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    
+                    if (!data.values || data.values.length < 2) {
+                        console.warn(`Warning: No seller data found for sheet ${period.sheet}`);
+                        continue;
+                    }
+
+                    const [headerRow, ...sellerRows] = data.values;
+                    // The Designation column is at index 2 (A=0, B=1, C=2) based on your range 'A6:R...'
+                    const designationColumnIndex = 2; 
+                    const dateColumnsStartIndex = 3; 
+                    const dataColumnsEndIndex = headerRow.length; 
+                    
+                    // Iterate through each seller row
+                    sellerRows.forEach(row => {
+                        const designation = (row[designationColumnIndex] || '').trim().toUpperCase();
+                        
+                        // Check attendance across all date columns (starting from index 3)
+                        for (let i = dateColumnsStartIndex; i < dataColumnsEndIndex; i++) {
+                            const rawStatus = (row[i] || '').trim().toUpperCase();
+                            const isPresent = rawStatus.includes('PRESENT') || rawStatus === 'P';
+                            
+                            if (isPresent) {
+                                if (designation.includes('TEAM LEADER') || designation.includes('TL')) {
+                                    totalTLAttendance++;
+                                } else if (designation.includes('SELLER')) {
+                                    totalSellerAttendance++;
+                                }
+                            }
+                        }
+                    });
+                }
+                
+                const totalManpowerDays = totalTLAttendance + totalSellerAttendance;
+
+                modalBody.innerHTML = `
+                    <div class="text-center p-5">
+                        <h1 class="gold-accent display-4 fw-bold">${totalManpowerDays}</h1>
+                        <p class="text-white-50 fs-5">Total Manpower Days (Present Days) deployed during this period.</p>
+                        <hr class="border-secondary my-3">
+                        <p class="text-white fs-6 mb-1">Team Leader Attendance: <span class="fw-bold text-success">${totalTLAttendance} Days</span></p>
+                        <p class="text-white fs-6">Sellers Attendance: <span class="fw-bold text-success">${totalSellerAttendance} Days</span></p>
+                    </div>
+                `;
+
+            } catch (error) {
+                // Show the specific error in the modal, but remove the alert() wrapper
+                modalBody.innerHTML = `<div class="alert alert-danger">❌ Failed to calculate total sellers. Error: ${error.message}</div>`;
+                console.error('Error fetching total sellers deployed:', error);
+            }
+        }
+
+
+        // --- NEW: CALENDAR FUNCTIONS ---
+
+        /**
+         * Renders a basic calendar structure for the current month and attaches click handlers.
+         * @param {string} targetId - The ID of the container to render the calendar into.
+         * @param {Date} date - The date object used to determine the current month/year.
+         */
+        async function renderAttendanceCalendar(targetId, date) {
+            const container = document.getElementById(targetId);
+            const year = date.getFullYear();
+            const month = date.getMonth();
+            
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0 = Sunday, 1 = Monday...
+            
+            const monthName = date.toLocaleString('default', { month: 'long' });
+            
+            // FIX: Get the range config here, but only to check if the month exists
+            const configCheck = getAttendanceRange(date);
+            const isConfigured = !!configCheck; 
+
+            if (!isConfigured) {
+                container.innerHTML = `<div class="alert alert-danger">❌ Error: No sheet configuration found for ${monthName} ${year}. Please check ATTENDANCE_CONFIG.</div>`;
+                return;
+            }
+
+            let calendarHtml = `
+                <div class="futuristic-card">
+                    <div class="calendar-nav text-center mb-2">
+                        <button onclick="changeCalendarMonth(-1)" title="Previous Month">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <!-- FIX: Only display Month and Year -->
+                        <span>${monthName} ${year}</span>
+                        <button onclick="changeCalendarMonth(1)" title="Next Month">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="calendar-grid">
+                        <div class="day-name">Sun</div>
+                        <div class="day-name">Mon</div>
+                        <div class="day-name">Tue</div>
+                        <div class="day-name">Wed</div>
+                        <div class="day-name">Thu</div>
+                        <div class="day-name">Fri</div>
+                        <div class="day-name">Sat</div>
+            `;
+
+            // Add leading blank days
+            for (let i = 0; i < firstDayOfMonth; i++) {
+                calendarHtml += `<div class="day-cell inactive"></div>`;
+            }
+
+            // Add days of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                // Formatting date string as M/D/YYYY to match spreadsheet header (e.g., 9/1/2025)
+                const dateString = `${month + 1}/${day}/${year}`;
+                
+                // Attach the click handler to call fetchAndShowDailyAttendance
+                calendarHtml += `<div class="day-cell" data-date="${dateString}" onclick="fetchAndShowDailyAttendance('${dateString}')">${day}</div>`;
+            }
+
+            calendarHtml += `</div></div>`;
+            container.innerHTML = calendarHtml;
+        }
+        
+        /**
+         * Navigates the calendar view by changing the currentCalendarDate.
+         * @param {number} offset - -1 for previous month, 1 for next month.
+         */
+        function changeCalendarMonth(offset) {
+            // Clear cache because we are looking at a new sheet/range
+            attendanceDataCache = null; 
+            
+            // Set the new date based on the current date + offset
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + offset);
+            
+            // Re-render the calendar for the new month/year
+            renderAttendanceCalendar('seller-content', currentCalendarDate);
+        }
+
+        /**
+         * Fetches all necessary attendance data from the sheet (if not cached), 
+         * extracts details for the clicked date, and displays the modal with full history.
+         * * @param {string} dateString - The date clicked (e.g., "9/29/2025").
+         */
+        async function fetchAndShowDailyAttendance(dateString) {
+            const modalBody = document.getElementById('attendanceDetailsBody');
+            const modalTitle = document.getElementById('attendanceModalLabel');
+            modalTitle.textContent = `Daily Attendance & History for ${dateString}`;
+            modalBody.innerHTML = '<div class="text-center p-3 text-secondary"><i class="fas fa-spinner fa-spin gold-accent me-2"></i> Fetching attendance details...</div>';
+            
+            const modal = new bootstrap.Modal(document.getElementById('attendanceModal'));
+            modal.show();
+
+            const rangeConfig = getAttendanceRange(new Date(dateString));
+            // The rangeConfig for a single date must NOT have the 'periods' property.
+            if (!rangeConfig || rangeConfig.periods) { 
+                 modalBody.innerHTML = `<div class="alert alert-danger">❌ Configuration Error: No single range defined for this date. Check ATTENDANCE_CONFIG.</div>`;
+                 return;
+            }
+            const range = rangeConfig.range;
+
+
+            try {
+                let dataValues;
+                
+                // Cache logic check/fetch
+                if (attendanceDataCache && attendanceDataCache.range === range) {
+                     dataValues = attendanceDataCache.values;
+                } else {
+                    attendanceDataCache = null;
+                    dataValues = await fetchDataMatrix(range);
+                }
+                
+                // Helper to fetch and cache the data matrix
+                async function fetchDataMatrix(currentRange) {
+                    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(currentRange)}?key=${API_KEY}`;
+                    const response = await fetch(url);
+                    
+                    if (!response.ok) {
+                        const errorData = await response.json();
+                        throw new Error(errorData.error.message || `HTTP error! Status: ${response.status}`);
+                    }
+                    
+                    const data = await response.json();
+                    if (!data.values || data.values.length < 2) {
+                        throw new Error("Insufficient data for attendance matrix.");
+                    }
+                    // Store values and the range used in the cache
+                    attendanceDataCache = { values: data.values, range: currentRange };
+                    return data.values;
+                }
+                
+                const [headerRow, ...sellerRows] = dataValues;
+                
+                // Find the column index that matches the clicked date (Daily View)
+                // Date strings in the header row are assumed to be in index >= 3 (Column D onwards)
+                // Note: The structure expects First Name (Col 0), Last Name (Col 1), Designation (Col 2), then Dates (Col 3+)
+                
+                const dateHeaderIndex = headerRow.findIndex((cell, index) => {
+                    if (index < 3) return false; // Skip first three columns (Name/Designation)
+                    
+                    // Normalize clicked date (9/4/2025)
+                    const dateParts = dateString.split('/').map(p => p.startsWith('0') ? p.substring(1) : p);
+                    const normalizedClickedDate = dateParts.join('/'); // 9/4/2025
+                    
+                    // Normalize spreadsheet cell date (Handle 9/4/2025, 09/04/2025, etc.)
+                    // Check if cell is a valid date string before normalizing
+                    const cellDate = new Date(cell);
+                    let normalizedCell = '';
+                    if (!isNaN(cellDate)) {
+                        normalizedCell = cellDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' });
+                    }
+                    
+                    // Check original cell, normalized cell, and dateString directly for robust matching
+                    return normalizedClickedDate === normalizedCell || cell.trim() === dateString || cell.trim() === new Date(dateString).toLocaleDateString();
+                });
+
+                if (dateHeaderIndex === -1) {
+                    modalBody.innerHTML = `<div class="alert alert-warning">⚠️ No column data found for **${dateString}** in sheet **${range.split('!')[0]}**. Please ensure the spreadsheet header dates match the **M/D/YYYY** format.</div>`;
+                    return;
+                }
+                
+                // --- 1. Daily Present Seller List & Summary ---
+                let presentCount = 0;
+                let presentSellers = [];
+                let totalSellers = sellerRows.length;
+                
+                sellerRows.forEach(row => {
+                    // Use index 0 and 1 for first and last name, assuming range starts at A7
+                    const fullName = `${row[0] || ''} ${row[1] || ''}`.trim();
+                    const rawStatus = (row[dateHeaderIndex] || '').trim().toUpperCase();
+                    const status = rawStatus === '' ? 'ABSENT' : rawStatus;
+                    
+                    if (!fullName) return; 
+
+                    // Check if seller is Present
+                    const isPresent = status.includes('PRESENT') || status === 'P'; 
+                    
+                    // Check if seller is Absent
+                    const isAbsent = status.includes('ABSENT') || status === 'A';
+                    
+                    if (isPresent) {
+                        presentCount++;
+                        presentSellers.push({ name: fullName, status: status, rowIndex: row.index });
+                    } else {
+                        // Count all other statuses (ABSENT, LATE, DAY OFF, etc.)
+                        presentSellers.push({ name: fullName, status: status, rowIndex: row.index });
+                    }
+                });
+                
+                // FIX: The total absent/other count is now removed
+
+
+                let htmlContent = `
+                    <h4 class="gold-accent mb-3">Daily Summary: ${dateString}</h4>
+                    <p class="text-center fw-bold text-lg text-white-75">
+                        <span class="text-success me-3">PRESENT: ${presentCount}</span>
+                    </p>
+                    <hr class="border-secondary">
+                `;
+
+                // --- NEW: List of Sellers Present/Absent/Other Today ---
+                if (presentSellers.length > 0) {
+                    htmlContent += '<h5 class="gold-accent mt-4 mb-2">Sellers Status Today:</h5>';
+                    htmlContent += '<ul class="present-seller-list list-group list-group-flush mb-4">';
+                    
+                    // Sort sellers by status (Present first, then Absent, then Other)
+                    presentSellers.sort((a, b) => {
+                        const statusA = (a.status || 'ABSENT').toUpperCase();
+                        const statusB = (b.status || 'ABSENT').toUpperCase();
+                        
+                        // Sort Present first
+                        if (statusA.includes('P') && !statusB.includes('P')) return -1;
+                        if (!statusA.includes('P') && statusB.includes('P')) return 1;
+                        
+                        // Sort Absent next
+                        if (statusA === 'ABSENT' && statusB !== 'ABSENT') return 1;
+                        if (statusA !== 'ABSENT' && statusB === 'ABSENT') return -1;
+                        
+                        return a.name.localeCompare(b.name); // Sort by name otherwise
+                    });
+
+                    presentSellers.forEach(seller => {
+                        const isAbsent = seller.status.includes('ABSENT') || seller.status === 'A';
+                        
+                        let statusIndicator = seller.status.length > 1 ? seller.status : (seller.status === 'P' ? 'PRESENT' : (seller.status === 'A' ? 'ABSENT' : seller.status));
+                        
+                        // FIX: Remove 'ABSENT' tag and leave it blank
+                        if (isAbsent) {
+                            statusIndicator = '';
+                        }
+                        
+                        let statusColorClass = 'text-info'; // Default for OTHER
+                        if (statusIndicator.includes('PRESENT') || statusIndicator === 'P') {
+                             statusColorClass = 'text-success';
+                        } else if (isAbsent) {
+                             statusColorClass = 'text-danger';
+                        }
+                        
+                        htmlContent += `<li class="list-group-item list-group-item-dark futuristic-card d-flex justify-content-between">
+                                            <span class="fw-bold">${seller.name}</span>
+                                            <span class="${statusColorClass}">${statusIndicator}</span>
+                                        </li>`;
+                    });
+                    htmlContent += '</ul><hr class="border-secondary">';
+                } else {
+                    htmlContent += '<div class="alert alert-info">No seller status records found for this day.</div>';
+                }
+                
+                if (totalSellers === 0) {
+                    modalBody.innerHTML = '<div class="alert alert-warning">No seller records found in the spreadsheet range for this period.</div>';
+                    return;
+                }
+
+                // --- 3. Full History Table for Present Sellers (Updated to include all tracked sellers) ---
+                htmlContent += `
+                    <h4 class="gold-accent mt-4 mb-3">Full Attendance History for All Tracked Sellers</h4>
+                    <div class="table-responsive">
+                    <table class="table table-dark table-bordered table-sm">
+                        <thead>
+                            <tr>
+                                <th scope="col" class="text-center">Seller</th>
+                `;
+
+                // Add date headers (starting from index 3 in headerRow)
+                const dateHeaders = headerRow.slice(3).filter(h => h.trim() !== '');
+
+                dateHeaders.forEach(dateH => {
+                    // Highlight the clicked date column
+                    const isClickedDay = new Date(dateH).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }) === new Date(dateString).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }) ? 'table-warning text-dark fw-bold' : '';
+                    htmlContent += `<th scope="col" class="attendance-cell ${isClickedDay}">${dateH.split('/')[1]}</th>`;
+                });
+
+                htmlContent += `</tr></thead><tbody>`;
+
+                // Add ALL seller rows for history view
+                sellerRows.forEach(sellerRow => {
+                    const fullName = (`${sellerRow[0] || ''} ${sellerRow[1] || ''}`).trim();
+                    if (!fullName) return; 
+
+                    htmlContent += `<tr><td class="fw-bold">${fullName}</td>`;
+
+                    // Add daily status cells (starting from index 3)
+                    sellerRow.slice(3).forEach((statusCell, index) => {
+                        const status = (statusCell || '').trim().toUpperCase();
+                        // Get the correct date header index for the background coloring
+                        const dateH = dateHeaders[index];
+                        const isClickedDay = new Date(dateH).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }) === new Date(dateString).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }) ? 'table-warning' : '';
+                        
+                        let displayStatus = status.substring(0, 1) || 'A';
+                        if (status === 'PRESENT' || status === 'P') {
+                            displayStatus = 'P';
+                        } else if (status === 'ABSENT' || status === '') {
+                             displayStatus = 'A';
+                        } else if (status.includes('LATE')) {
+                            displayStatus = 'L';
+                        } else if (status.includes('DAY OFF') || status === 'D') {
+                            displayStatus = 'D';
+                        } else if (status.length > 1) {
+                            // Use first initial if status is complex (e.g., 'SICK', 'VACATION')
+                            displayStatus = status.substring(0, 1);
+                        }
+                        
+                        // Use a background color based on the status abbreviation
+                        const statusClass = `status-${displayStatus}`;
+                        htmlContent += `<td class="attendance-cell ${statusClass} ${isClickedDay}">${displayStatus}</td>`;
+                    });
+
+                    htmlContent += `</tr>`;
+                });
+
+                htmlContent += `</tbody></table></div>`;
+                
+                modalBody.innerHTML = htmlContent;
+
+            } catch (error) {
+                modalBody.innerHTML = `<div class="alert alert-danger">❌ Failed to load attendance. Error: ${error.message}</div>`;
+                console.error(`Error loading attendance for ${dateString}:`, error);
             }
         }
 
@@ -719,6 +1441,17 @@
             const targetElement = document.getElementById(targetId);
             if (targetElement) {
                 targetElement.style.display = 'block';
+                
+                // FIX: If the Mandays view is loaded, render the calendar immediately.
+                if (viewId === 'mandays') {
+                    // Check if the target content area exists before rendering
+                    const calendarContentArea = document.getElementById('seller-content');
+                    if (calendarContentArea) {
+                        // We call renderAttendanceCalendar directly, bypassing the collapsed listener, 
+                        // which ensures it loads even if the element state is initially tricky.
+                        renderAttendanceCalendar('seller-content', currentCalendarDate);
+                    }
+                }
             }
         }
 
@@ -727,7 +1460,7 @@
         function setupCollapseListener(contentId, range, config = {}) {
             document.getElementById(contentId).addEventListener('show.bs.collapse', function () {
                 // Check if content already exists to prevent repeated API calls/rendering
-                if (this.querySelector('.table-responsive') === null && this.querySelector('.chart-container') === null) {
+                if (this.querySelector('.table-responsive') === null && this.querySelector('.chart-container') === null && config.type !== 'calendar') {
                     if (config.type === 'chart') {
                         // For chart rendering, call the specific chart function
                         fetchAndRenderChart(
@@ -745,6 +1478,13 @@
                             config.customHeaders
                         );
                     }
+                } else if (config.type === 'calendar') {
+                     // The calendar is now rendered by switchView, so this block is mostly for completeness.
+                    // renderAttendanceCalendar(contentId, currentCalendarDate); 
+                }
+                 // NEW: Call the list renderer specifically for the attendance list
+                if (config.type === 'attendance_list') {
+                     renderAttendanceListPerSeller(contentId);
                 }
             });
             // Cleanup on hide
@@ -757,8 +1497,15 @@
         }
 
         // 1. MANDAYS REPORTS
-        setupCollapseListener('mandays-content', 'FSF Monitoring/Report!F2:H3'); // EDITABLE: Mandays Monitoring Range
-        setupCollapseListener('seller-content', 'September 16 to 30, 2025!C6:V26'); // EDITABLE: Seller Attendance Range
+        // We keep the listener here, but the primary rendering is now in switchView for reliability.
+        setupCollapseListener('seller-content', '', { type: 'calendar' }); 
+
+        // New Chart Listener: Attendance Per Seller Chart
+        // FIX: The type is changed from 'chart' to 'attendance_list' and the canvas ID is removed.
+        setupCollapseListener('attendance-seller-chart-content', '', {
+            type: 'attendance_list',
+            // canvasId is no longer needed
+        });
 
         // 2. POSTPAID REPORTS
         setupCollapseListener('postpaid-submitted-content', 'Sheet2!U16:W16', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITED: Custom Headers and Data-Only Range
@@ -780,17 +1527,27 @@
         setupCollapseListener('simsold-activated-content', 'Sheet2!U25:W25', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: No. of Activated Range
         
         // --- SIM Sold Charts ---
-        // Visual Chart for Sold per Day (Line Chart for Time Series Data)
-        // FIX: The query now uses the Google Visualization endpoint to transpose the single-row data (C22:AI22)
-        setupCollapseListener('simsold-daily-chart-content', 'chartdataFSF Monitoring/Report!C22:AI22', { 
+        // 4A. Visual Chart for Sold per Day (Line Chart for Time Series Data)
+        setupCollapseListener('simsold-daily-chart-content', 'FSF Monitoring/Report!C3:AI17', { 
             type: 'chart', 
             canvasId: 'simSoldDailyChart', 
-            chartTitle: 'SIM Sold Performance per Day', 
+            chartTitle: 'SIM Sold Performance per Day (Total Sales)', 
             dataLabel: 'Sold Units', 
-            chartType: 'line' 
+            chartType: 'line',
+            processingMode: 'daily_total' // New mode for column sums
         }); 
         
-        // Visual Chart for Activated per Seller (Bar Chart for Categorical Data)
+        // 4B. Visual Chart for Total Sold per Seller (Bar Chart for Categorical Data)
+        setupCollapseListener('simsold-seller-total-chart-content', 'FSF Monitoring/Report!C3:AI17', { 
+            type: 'chart', 
+            canvasId: 'simSoldSellerTotalChart', 
+            chartTitle: 'Total SIM Sold per Seller (All Dates)', 
+            dataLabel: 'Total Sold Units', 
+            chartType: 'bar',
+            processingMode: 'seller_total' // New mode for row sums
+        });
+
+        // 4C. Visual Chart for Activated per Seller (Original Block)
         setupCollapseListener('simsold-seller-chart-content', 'Sheet2!D1:E10', { 
             type: 'chart', 
             canvasId: 'simSoldSellerChart', 
