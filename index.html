@@ -589,16 +589,22 @@
     </div>
     <!-- End Modal -->
 
+    <hr>
+    <br>
+
     <footer class="py-3 mt-auto bg-dark">
         <div class="container">
             <!-- Main IP Statement Paragraph -->
-            <p class="m-0 text-center text-white-50" style="color: red !important;">
-All content, data visualizations, reports, and design elements presented on this website and in associated documents are the intellectual property of Gracelle Anne Magnaye, CCMGI Project Coordinator. These materials are protected under applicable copyright and intellectual property laws.
+            <p class="m-0 text-center text-white-50" style="color: #FFBF00 !important; font-size: 0.8rem;">
+                <!-- Used Bootstrap text-center for block-level centering of content -->
+                <span style="display: block; text-align: justify; margin: 0 auto; max-width: 90%;">
+                    All content, data visualizations, reports, and design elements presented on this website and in associated documents are the intellectual property of Gracelle Anne Magnaye, CCMGI Project Coordinator. These materials are protected under applicable copyright and intellectual property laws.
 Unauthorized reproduction, distribution, modification, or commercial use of any part of these reports—whether in whole or in part—is strictly prohibited without prior written consent. This includes, but is not limited to, copying data structures, UI/UX layouts, dashboard components, and embedded analytics.
 Use of these materials by clients and stakeholders is permitted solely for internal review and decision-making purposes. Any external sharing or publication must be explicitly approved.
+                </span>
             </p>
-            <!-- Separate Copyright Line, now in red and bold -->
-            <p class="m-0 text-center fw-bold" style="color: red !important;">
+            <!-- Separate Copyright Line, now in silver and bold -->
+            <p class="m-0 text-center fw-bold" style="color: #C0C0C0 !important;">
                 © 2025 Gracelle Anne Magnaye, CCMGI. All rights reserved.
             </p>
         </div>
@@ -1379,7 +1385,6 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                     const normalizedClickedDate = dateParts.join('/'); // 9/4/2025
                     
                     // Normalize spreadsheet cell date (Handle 9/4/2025, 09/04/2025, etc.)
-                    // Check if cell is a valid date string before normalizing
                     const cellDate = new Date(cell);
                     let normalizedCell = '';
                     if (!isNaN(cellDate)) {
@@ -1648,16 +1653,12 @@ Use of these materials by clients and stakeholders is permitted solely for inter
             // 2. POSTPAID REPORTS
             // NEW: Total Applications Processed
             setupCollapseListener('postpaid-total-processed-content', 'summaryReports!AE16:AG16', {customHeaders: ['Total', 'Target', 'Achievement']}); 
-         
             // NEW: Total Applications Approved
             setupCollapseListener('postpaid-total-approved-content', 'summaryReports!AE17:AG17', {customHeaders: ['Total', 'Target', 'Achievement']});
-             
             // NEW: Total Applications Installed
-            setupCollapseListener('postpaid-total-installed-content', 'summaryReports!AE18:AG18', {customHeaders: ['Total', 'Target', 'Achievement']});
-            
+            setupCollapseListener('postpaid-total-installed-content', 'summaryReports!AE18:AG18', {customHeaders: ['Total', 'Target', 'Achievement']});           
             // NEW: Total Pending Installation
-            setupCollapseListener('postpaid-pending-install-content', 'summaryReports!AE19:AG19', {customHeaders: ['Total', 'Target', 'Achievement']});
-             
+            setupCollapseListener('postpaid-pending-install-content', 'summaryReports!AE19:AG19', {customHeaders: ['Total', 'Target', 'Achievement']});         
             // NEW: Total Pending Approval
             setupCollapseListener('postpaid-pending-approval-content', 'summaryReports!AE20:AG20', {customHeaders: ['Total', 'Target', 'Achievement']});
             
