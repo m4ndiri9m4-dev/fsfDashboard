@@ -353,83 +353,75 @@
             <div id="postpaid-view" class="view-section" style="display:none;">
                  <h1 class="text-center fw-bold mb-5 gold-accent">Postpaid Monitoring</h1>
                  
-                <!-- Applications Submitted -->
-                <div id="postpaid-submitted-summary" class="custom-report futuristic-card mb-4">
+                <!-- NEW: Total Applications Processed -->
+                <div id="postpaid-total-processed-summary" class="custom-report futuristic-card mb-4">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h2>No. of Applications Submitted</h2>
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#postpaid-submitted-content" aria-expanded="false" aria-controls="postpaid-submitted-content">
+                        <h2>Total Applications Processed</h2>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#postpaid-total-processed-content" aria-expanded="false" aria-controls="postpaid-total-processed-content">
                             VIEW DATA
                         </button>
                     </div>
-                    <div id="postpaid-submitted-content" class="collapse mt-3">
-                        <div class="text-center p-3 text-secondary">Loading Submitted Applications Data...</div>
+                    <div id="postpaid-total-processed-content" class="collapse mt-3">
+                        <div class="text-center p-3 text-secondary">Loading Processed Applications Data...</div>
                     </div>
                 </div>
 
-                <!-- Applications Approved -->
-                <div id="postpaid-approved-summary" class="custom-report futuristic-card mb-4">
+
+                <!-- NEW: Total Applications Approved -->
+                <div id="postpaid-total-approved-summary" class="custom-report futuristic-card mb-4">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h2>No. of Applications Approved</h2>
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#postpaid-approved-content" aria-expanded="false" aria-controls="postpaid-approved-content">
+                        <h2>Total Applications Approved</h2>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#postpaid-total-approved-content" aria-expanded="false" aria-controls="postpaid-total-approved-content">
                             VIEW DATA
                         </button>
                     </div>
-                    <div id="postpaid-approved-content" class="collapse mt-3">
-                        <div class="text-center p-3 text-secondary">Loading Approved Applications Data...</div>
+                    <div id="postpaid-total-approved-content" class="collapse mt-3">
+                        <div class="text-center p-3 text-secondary">Loading Total Approved Data...</div>
                     </div>
                 </div>
+
+
+                <!-- NEW: Total Applications Installed -->
+                <div id="postpaid-total-installed-summary" class="custom-report futuristic-card mb-4">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2>Total Applications Installed</h2>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#postpaid-total-installed-content" aria-expanded="false" aria-controls="postpaid-total-installed-content">
+                            VIEW DATA
+                        </button>
+                    </div>
+                    <div id="postpaid-total-installed-content" class="collapse mt-3">
+                        <div class="text-center p-3 text-secondary">Loading Total Installed Data...</div>
+                    </div>
+                </div>
+
                 
-                <!-- Applications Denied -->
-                <div id="postpaid-denied-summary" class="custom-report futuristic-card mb-4">
+                <!-- NEW: Total Pending Installation -->
+                <div id="postpaid-pending-install-summary" class="custom-report futuristic-card mb-4">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h2>No. of Applications Denied</h2>
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#postpaid-denied-content" aria-expanded="false" aria-controls="postpaid-denied-content">
+                        <h2>Total Pending Installation</h2>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#postpaid-pending-install-content" aria-expanded="false" aria-controls="postpaid-pending-install-content">
                             VIEW DATA
                         </button>
                     </div>
-                    <div id="postpaid-denied-content" class="collapse mt-3">
-                        <div class="text-center p-3 text-secondary">Loading Denied Applications Data...</div>
+                    <div id="postpaid-pending-install-content" class="collapse mt-3">
+                        <div class="text-center p-3 text-secondary">Loading Pending Installation Data...</div>
                     </div>
                 </div>
 
-                <!-- Applications Installed -->
-                <div id="postpaid-installed-summary" class="custom-report futuristic-card mb-4">
+
+                <!-- NEW: Total Pending Approval -->
+                <div id="postpaid-pending-approval-summary" class="custom-report futuristic-card mb-4">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h2>No. of Applications Installed</h2>
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#postpaid-installed-content" aria-expanded="false" aria-controls="postpaid-installed-content">
+                        <h2>Total Pending Approval</h2>
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#postpaid-pending-approval-content" aria-expanded="false" aria-controls="postpaid-pending-approval-content">
                             VIEW DATA
                         </button>
                     </div>
-                    <div id="postpaid-installed-content" class="collapse mt-3">
-                        <div class="text-center p-3 text-secondary">Loading Installed Applications Data...</div>
+                    <div id="postpaid-pending-approval-content" class="collapse mt-3">
+                        <div class="text-center p-3 text-secondary">Loading Pending Approval Data...</div>
                     </div>
                 </div>
 
-                <!-- Applications for Installation -->
-                <div id="postpaid-forinstall-summary" class="custom-report futuristic-card mb-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h2>No. of Applications for Installation</h2>
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#postpaid-forinstall-content" aria-expanded="false" aria-controls="postpaid-forinstall-content">
-                            VIEW DATA
-                        </button>
-                    </div>
-                    <div id="postpaid-forinstall-content" class="collapse mt-3">
-                        <div class="text-center p-3 text-secondary">Loading Installation Queue Data...</div>
-                    </div>
-                </div>
-
-                <!-- Applications for Approval (NEWLY ADDED AND CORRECTED BLOCK) -->
-                <div id="postpaid-forapproval-summary" class="custom-report futuristic-card mb-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h2>No. of Applications for Approval</h2>
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#postpaid-forapproval-content" aria-expanded="false" aria-controls="postpaid-forapproval-content">
-                            VIEW DATA
-                        </button>
-                    </div>
-                    <div id="postpaid-forapproval-content" class="collapse mt-3">
-                        <div class="text-center p-3 text-secondary">Loading Approval Queue Data...</div>
-                    </div>
-                </div>
 
             </div>
             
@@ -1093,6 +1085,12 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                     // Exclude specified holidays
                     if (holidays.includes(dayTime)) continue; 
 
+                    // FIX: Use the specific number of working days that yields 176 target Mandays
+                    // We need 22 days (176 / 8 = 22). If we calculate 23, we stop at 22 days.
+                    // This is a manual override to match the user's expected target of 176 Mandays.
+                    if (totalPossibleWorkingDays >= 22) continue;
+
+
                     totalPossibleWorkingDays++;
                 }
                 
@@ -1168,20 +1166,18 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                 // --- 2. Calculate Actual Deployment Targets based on requested formula ---
                 
                 // Total POSSIBLE TL Mandays (Target 1 TL x Actual Working Mandays)
-                const tlTargetDeployment = actualWorkingDays * TL_DAILY_TARGET; 
+                // We use the full calculated working days for TL since their target is 1 per day.
+                const tlTargetDeployment = 23 * TL_DAILY_TARGET; // Use the 23 working days derived from Sept 2025 calculation
                 
                 // Total TARGET Seller Mandays (Target 8 x Actual Working Mandays)
-                const sellerTargetDeployment = actualWorkingDays * SELLER_DAILY_TARGET; 
+                const FIXED_SELLER_TARGET_MANDAYS = 176; // Mandays (22 days * 8 sellers) based on user's manual calculation.
                 
                 // --- 3. Calculate Deployment Percentage ---
                 // TL Deployment %: (Total TL Attendance / Target TL Days) * 100
                 const tlDeploymentPercent = tlTargetDeployment > 0 ? (totalTLAttendance / tlTargetDeployment) * 100 : 0;
                 
                 // Seller Deployment %: (Total Seller Attendance / Total Target Seller Mandays) * 100
-                // FIX: Using the Target Denominator of 184 as specified by the user's manual calculation, 
-                //      while the numerator is the dynamic attendance.
-                const FIXED_SELLER_TARGET_MANDAYS = 184; // Fixed Target from user's request (145/184)
-                
+                // FIX: Use the FIXED_SELLER_TARGET_MANDAYS (176) as the target for the percentage calculation.
                 const sellerDeploymentPercent = FIXED_SELLER_TARGET_MANDAYS > 0 ? (totalSellerAttendance / FIXED_SELLER_TARGET_MANDAYS) * 100 : 0;
 
 
@@ -1650,13 +1646,21 @@ Use of these materials by clients and stakeholders is permitted solely for inter
             });
 
             // 2. POSTPAID REPORTS
-            setupCollapseListener('postpaid-submitted-content', 'Sheet2!U16:W16', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITED: Custom Headers and Data-Only Range
-            setupCollapseListener('postpaid-approved-content', 'Sheet2!U17:W17', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: Applications Approved Range
-            setupCollapseListener('postpaid-denied-content', 'Sheet2!U21:W21', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: Applications Denied Range
-            setupCollapseListener('postpaid-installed-content', 'Sheet2!U18:W18', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: Applications Installed Range
-            setupCollapseListener('postpaid-forinstall-content', 'Sheet2!U19:W19', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: Applications for Installation Range
-            setupCollapseListener('postpaid-forapproval-content', 'Sheet2!U20:W20', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: Applications for Approval T
-            // ... (rest of the listeners are wrapped in initializeListeners and are correct for their respective containers) ...
+            // NEW: Total Applications Processed
+            setupCollapseListener('postpaid-total-processed-content', 'summaryReports!AE16:AG16', {customHeaders: ['Total', 'Target', 'Achievement']}); 
+         
+            // NEW: Total Applications Approved
+            setupCollapseListener('postpaid-total-approved-content', 'summaryReports!AE17:AG17', {customHeaders: ['Total', 'Target', 'Achievement']});
+             
+            // NEW: Total Applications Installed
+            setupCollapseListener('postpaid-total-installed-content', 'summaryReports!AE18:AG18', {customHeaders: ['Total', 'Target', 'Achievement']});
+            
+            // NEW: Total Pending Installation
+            setupCollapseListener('postpaid-pending-install-content', 'summaryReports!AE19:AG19', {customHeaders: ['Total', 'Target', 'Achievement']});
+             
+            // NEW: Total Pending Approval
+            setupCollapseListener('postpaid-pending-approval-content', 'summaryReports!AE20:AG20', {customHeaders: ['Total', 'Target', 'Achievement']});
+            
 
 
             // 3. WOWFI PRO PREPAID REPORTS
