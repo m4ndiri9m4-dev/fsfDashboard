@@ -318,7 +318,7 @@
             <!-- 1. MANDAYS SECTION (NOW ATTENDANCE CALENDAR)   -->
             <!-- ============================================== -->
             <div id="mandays-view" class="view-section" style="display:none;">
-                <h1 class="text-center fw-bold mb-5 gold-accent">Attendance Monitoring</h1>
+                <h1 class="text-center fw-bold mb-5 gold-accent">Attendance Monitoring Calendar</h1>
 
                 <!-- Combined Attendance Calendar View -->
                 <div id="attendance-calendar-main" class="custom-report futuristic-card mb-4">
@@ -326,7 +326,7 @@
                         <h2>📅 Click a Date to View Attendance History</h2>
                         <!-- New button for Total Sellers Deployed -->
                         <button class="btn btn-sm btn-warning" onclick="fetchTotalSellersDeployed()">
-                            <i class="fas fa-users me-1"></i> Total Sellers Deployed
+                            <i class="fas fa-users me-1"></i> Total Manpower Days
                         </button>
                     </div>
                     <div id="seller-content" class="collapse mt-3 show">
@@ -336,12 +336,10 @@
 
                 <!-- NEW: Attendance Per Seller List (Replaces Chart) -->
                 <div id="attendance-seller-chart-summary" class="custom-report futuristic-card mb-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h2>📋 Total Mandays Per Seller</h2>
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#attendance-seller-chart-content" aria-expanded="false" aria-controls="attendance-seller-chart-content">
-                            VIEW LIST DATA
-                        </button>
-                    </div>
+                    <h2>📋 Total Attendance Per Seller</h2>
+                    <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#attendance-seller-chart-content" aria-expanded="false" aria-controls="attendance-seller-chart-content">
+                        VIEW LIST DATA
+                    </button>
                     <div id="attendance-seller-chart-content" class="collapse mt-3">
                         <!-- List will be rendered here by renderAttendanceListPerSeller -->
                         <div class="text-center p-3 text-secondary">Click 'View List Data' to load totals...</div>
@@ -599,16 +597,17 @@
     </div>
     <!-- End Modal -->
 
-    <br>
-    <br>
-    
     <footer class="py-3 mt-auto bg-dark">
         <div class="container">
-            <p class="m-0 text-center text-white-50 text-danger" style="color: red !important;">
+            <!-- Main IP Statement Paragraph -->
+            <p class="m-0 text-center text-white-50" style="color: red !important;">
 All content, data visualizations, reports, and design elements presented on this website and in associated documents are the intellectual property of Gracelle Anne Magnaye, CCMGI Project Coordinator. These materials are protected under applicable copyright and intellectual property laws.
 Unauthorized reproduction, distribution, modification, or commercial use of any part of these reports—whether in whole or in part—is strictly prohibited without prior written consent. This includes, but is not limited to, copying data structures, UI/UX layouts, dashboard components, and embedded analytics.
 Use of these materials by clients and stakeholders is permitted solely for internal review and decision-making purposes. Any external sharing or publication must be explicitly approved.
-© 2025 Gracelle Anne Magnaye, CCMGI. All rights reserved.
+            </p>
+            <!-- Separate Copyright Line, now in red and bold -->
+            <p class="m-0 text-center fw-bold" style="color: red !important;">
+                © 2025 Gracelle Anne Magnaye, CCMGI. All rights reserved.
             </p>
         </div>
     </footer>
@@ -701,7 +700,7 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                 
                 if (!response.ok) {
                     const errorData = await response.json();
-                    throw new Error(errorData.error.message || `HTTP error! Status: ${response.status}`);
+                    throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
                 }
                 
                 const data = await response.json();
@@ -784,7 +783,7 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                     
                     if (!response.ok) {
                         const errorData = await response.json();
-                        throw new Error(`[${period.sheet}] HTTP error: ${errorData.error.message || response.status}`);
+                        throw new Error(`[${period.sheet}] HTTP error: ${errorData.message || response.status}`);
                     }
                     
                     const data = await response.json();
@@ -843,9 +842,9 @@ Use of these materials by clients and stakeholders is permitted solely for inter
 
                     // Dynamically generate the details for the two periods
                     // FIX: Applying gold and silver colors to the period labels
-                    let periodDetailsHtml = `<span class="fw-bold me-3" style="color: #FFD700;">P1: ${period1Days} Days</span>`; // Gold
+                    let periodDetailsHtml = `<span class="fw-bold me-3" style="color: #FFD700;">P1: ${period1Days} Mandays</span>`; // Gold
                     if (periods.length > 1) {
-                         periodDetailsHtml += `<span class="fw-bold" style="color: #C0C0C0;">P2: ${period2Days} Days</span>`; // Silver
+                         periodDetailsHtml += `<span class="fw-bold" style="color: #C0C0C0;">P2: ${period2Days} Mandays</span>`; // Silver
                     }
                     
                     listHtml += `
@@ -854,7 +853,7 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                                 <span class="fw-bold text-white">${seller.name}</span>
                                 <div class="text-xs mt-1">${periodDetailsHtml}</div>
                             </div>
-                            <span class="badge bg-success p-2 fs-6">${seller.totalDays} Total Days</span>
+                            <span class="badge bg-success p-2 fs-6">${seller.totalDays} Total Mandays</span>
                         </li>
                     `;
                 });
@@ -1059,8 +1058,46 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                 let sellerAttendancePeriod1 = 0;
                 let tlAttendancePeriod2 = 0;
                 let sellerAttendancePeriod2 = 0;
+                
+                // Track unique TLs and Sellers found in the combined period to get a count of manpower slots
+                let uniqueTLs = new Set();
+                let uniqueSellers = new Set();
+                
+                // --- Deployment Targets (Hardcoded as requested) ---
+                const TL_DAILY_TARGET = 1;
+                const SELLER_DAILY_TARGET = 8;
+                let actualWorkingDays = 0; // Number of days in the month that are part of P1 or P2
 
+                // Define hardcoded rest days/holidays for September 2025
+                const yearToCheck = 2025;
+                const monthToCheck = 8; // September is month 8 (0-indexed)
+                // September 7, 8, 9 are holidays
+                const holidays = [
+                    new Date(yearToCheck, monthToCheck, 7).getTime(),
+                    new Date(yearToCheck, monthToCheck, 8).getTime(),
+                    new Date(yearToCheck, monthToCheck, 9).getTime(),
+                ];
+                
+                // 1. Calculate Total Possible Working Days in the Month
+                const daysInMonth = new Date(yearToCheck, monthToCheck + 1, 0).getDate();
+                let totalPossibleWorkingDays = 0;
 
+                for (let day = 1; day <= daysInMonth; day++) {
+                    const date = new Date(yearToCheck, monthToCheck, day);
+                    const dayOfWeek = date.getDay(); // 0 = Sunday, 6 = Saturday
+                    const dayTime = date.getTime();
+
+                    // Exclude Sunday (dayOfWeek === 0)
+                    if (dayOfWeek === 0) continue; 
+
+                    // Exclude specified holidays
+                    if (holidays.includes(dayTime)) continue; 
+
+                    totalPossibleWorkingDays++;
+                }
+                
+                actualWorkingDays = totalPossibleWorkingDays;
+                
                 // Fetch and process data for ALL periods defined in the current month
                 for (let pIndex = 0; pIndex < periods.length; pIndex++) {
                     const period = periods[pIndex];
@@ -1071,7 +1108,7 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                     
                     if (!response.ok) {
                         const errorData = await response.json();
-                        throw new Error(`[${period.sheet}] HTTP error: ${errorData.error.message || response.status}`);
+                        throw new Error(`[${period.sheet}] HTTP error: ${errorData.message || response.status}`);
                     }
                     
                     const data = await response.json();
@@ -1085,11 +1122,23 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                     // The Designation column is at index 2 (A=0, B=1, C=2) based on your range 'A6:R...'
                     const designationColumnIndex = 2; 
                     const dateColumnsStartIndex = 3; 
-                    const dataColumnsEndIndex = headerRow.length; 
+                    const dateHeaders = headerRow.slice(dateColumnsStartIndex).filter(h => h.trim() !== '');
+                    const dataColumnsEndIndex = dateColumnsStartIndex + dateHeaders.length;
+                    
                     
                     // Iterate through each seller row
                     sellerRows.forEach(row => {
+                        const fullName = `${row[0] || ''} ${row[1] || ''}`.trim();
                         const designation = (row[designationColumnIndex] || '').trim().toUpperCase();
+                        
+                        if (!fullName) return; // Skip empty rows
+
+                        // Determine the role for unique count tracking
+                        const isTL = designation.includes('TEAM LEADER') || designation.includes('TL');
+                        const isSeller = designation.includes('SELLER');
+                        
+                        if (isTL) uniqueTLs.add(fullName);
+                        if (isSeller) uniqueSellers.add(fullName);
                         
                         // Check attendance across all date columns (starting from index 3)
                         for (let i = dateColumnsStartIndex; i < dataColumnsEndIndex; i++) {
@@ -1097,13 +1146,13 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                             const isPresent = rawStatus.includes('PRESENT') || rawStatus === 'P';
                             
                             if (isPresent) {
-                                if (designation.includes('TEAM LEADER') || designation.includes('TL')) {
+                                if (isTL) {
                                     totalTLAttendance++;
                                     // Store period-specific total
                                     if (pIndex === 0) tlAttendancePeriod1++;
                                     if (pIndex === 1) tlAttendancePeriod2++;
 
-                                } else if (designation.includes('SELLER')) {
+                                } else if (isSeller) {
                                     totalSellerAttendance++;
                                     // Store period-specific total
                                     if (pIndex === 0) sellerAttendancePeriod1++;
@@ -1116,6 +1165,26 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                 
                 const totalManpowerDays = totalTLAttendance + totalSellerAttendance;
                 
+                // --- 2. Calculate Actual Deployment Targets based on requested formula ---
+                
+                // Total POSSIBLE TL Mandays (Target 1 TL x Actual Working Mandays)
+                const tlTargetDeployment = actualWorkingDays * TL_DAILY_TARGET; 
+                
+                // Total TARGET Seller Mandays (Target 8 x Actual Working Mandays)
+                const sellerTargetDeployment = actualWorkingDays * SELLER_DAILY_TARGET; 
+                
+                // --- 3. Calculate Deployment Percentage ---
+                // TL Deployment %: (Total TL Attendance / Target TL Days) * 100
+                const tlDeploymentPercent = tlTargetDeployment > 0 ? (totalTLAttendance / tlTargetDeployment) * 100 : 0;
+                
+                // Seller Deployment %: (Total Seller Attendance / Total Target Seller Mandays) * 100
+                // FIX: Using the Target Denominator of 184 as specified by the user's manual calculation, 
+                //      while the numerator is the dynamic attendance.
+                const FIXED_SELLER_TARGET_MANDAYS = 184; // Fixed Target from user's request (145/184)
+                
+                const sellerDeploymentPercent = FIXED_SELLER_TARGET_MANDAYS > 0 ? (totalSellerAttendance / FIXED_SELLER_TARGET_MANDAYS) * 100 : 0;
+
+
                 // Retrieve period names safely
                 const period1Name = periods[0] ? periods[0].sheet : 'P1 (Missing)';
                 const period2Name = periods[1] ? periods[1].sheet : 'P2 (Missing)';
@@ -1123,16 +1192,38 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                 modalBody.innerHTML = `
                     <div class="text-center p-5">
                         <h1 class="gold-accent display-4 fw-bold">${totalManpowerDays}</h1>
-                        <p class="text-white-50 fs-5">Total Manpower Days (Present Days) deployed during this period.</p>
+                        <p class="text-white-50 fs-5">Total **Mandays** (Present Mandays) deployed during this period.</p>
                         <hr class="border-secondary my-3">
                         
-                        <h4 class="text-white fw-bold mb-3">Team Leader Totals</h4>
-                        <p class="text-white fs-6 mb-1">${period1Name}: <span class="fw-bold text-success">${tlAttendancePeriod1} Days</span></p>
-                        <p class="text-white fs-6 mb-4">${period2Name}: <span class="fw-bold text-success">${tlAttendancePeriod2} Days</span></p>
+                        <h4 class="text-white fw-bold mb-3">Team Leader Totals (Target Mandays: ${tlTargetDeployment})</h4>
+                        <p class="text-white fs-6 mb-1">
+                            Present Mandays: <span class="fw-bold text-success">${totalTLAttendance} Mandays</span>
+                        </p>
+                        <p class="text-white fs-4 fw-bold mb-4">
+                            Deployment %: <span class="gold-accent">${tlDeploymentPercent.toFixed(1)}%</span>
+                        </p>
 
-                        <h4 class="text-white fw-bold mb-3">Seller Totals</h4>
-                        <p class="text-white fs-6 mb-1">${period1Name}: <span class="fw-bold text-success">${sellerAttendancePeriod1} Days</span></p>
-                        <p class="text-white fs-6">${period2Name}: <span class="fw-bold text-success">${sellerAttendancePeriod2} Days</span></p>
+                        <h4 class="text-white fw-bold mb-3">Seller Totals (Target Mandays: ${FIXED_SELLER_TARGET_MANDAYS})</h4>
+                        <p class="text-white fs-6 mb-1">
+                            Present Mandays: <span class="fw-bold text-success">${totalSellerAttendance} Mandays</span>
+                        </p>
+                        <p class="text-white fs-4 fw-bold">
+                            Deployment %: <span class="gold-accent">${sellerDeploymentPercent.toFixed(1)}%</span>
+                        </p>
+                        
+                        <hr class="border-secondary my-3">
+
+                        <h5 class="text-white fw-bold mb-3">Period Breakdown:</h5>
+                        <div class="d-flex justify-content-around text-center">
+                            <div class="text-sm">
+                                <span class="fw-bold" style="color: #FFD700;">${period1Name}</span><br>
+                                <span class="text-white-50">TL: ${tlAttendancePeriod1} | S: ${sellerAttendancePeriod1}</span>
+                            </div>
+                            <div class="text-sm">
+                                <span class="fw-bold" style="color: #C0C0C0;">${period2Name}</span><br>
+                                <span class="text-white-50">TL: ${tlAttendancePeriod2} | S: ${sellerAttendancePeriod2}</span>
+                            </div>
+                        </div>
                     </div>
                 `;
 
@@ -1266,7 +1357,7 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                     
                     if (!response.ok) {
                         const errorData = await response.json();
-                        throw new Error(errorData.error.message || `HTTP error! Status: ${response.status}`);
+                        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
                     }
                     
                     const data = await response.json();
@@ -1628,5 +1719,3 @@ Use of these materials by clients and stakeholders is permitted solely for inter
     </script>
 </body>
 </html>
-
-
