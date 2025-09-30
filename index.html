@@ -431,57 +431,20 @@
             <div id="wowfipro-view" class="view-section" style="display:none;">
                 <h1 class="text-center fw-bold mb-5 gold-accent">WowFi Pro Prepaid Monitoring</h1>
                 
-                <!-- No. of Sold -->
+                <!-- NEW: Total WowFi Pro Sold -->
                 <div id="wowfi-sold-summary" class="custom-report futuristic-card mb-4">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h2>No. of Sold</h2>
+                        <h2>Total WowFi Pro Sold</h2>
                         <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#wowfi-sold-content" aria-expanded="false" aria-controls="wowfi-sold-content">
                             VIEW DATA
                         </button>
                     </div>
                     <div id="wowfi-sold-content" class="collapse mt-3">
-                        <div class="text-center p-3 text-secondary">Loading Sold Count Data...</div>
+                        <!-- Content will be loaded here -->
+                        <div class="text-center p-3 text-secondary">Click 'View Data' to load total sold count...</div>
                     </div>
                 </div>
-
-                <!-- No. of Activated -->
-                <div id="wowfi-activated-summary" class="custom-report futuristic-card mb-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h2>No. of Activated</h2>
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#wowfi-activated-content" aria-expanded="false" aria-controls="wowfi-activated-content">
-                            VIEW DATA
-                        </button>
-                    </div>
-                    <div id="wowfi-activated-content" class="collapse mt-3">
-                        <div class="text-center p-3 text-secondary">Loading Activated Count Data...</div>
-                    </div>
-                </div>
-
-                <!-- Visual Chart Sold/Activated per Day -->
-                <div id="wowfi-daily-chart-summary" class="custom-report futuristic-card mb-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h2>Visual Chart for Sold/Activated per Day</h2>
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#wowfi-daily-chart-content" aria-expanded="false" aria-controls="wowfi-daily-chart-content">
-                            VIEW CHART DATA
-                        </button>
-                    </div>
-                    <div id="wowfi-daily-chart-content" class="collapse mt-3">
-                        <div class="text-center p-3 text-secondary">Loading Seller Chart Data...</div>
-                    </div>
-                </div>
-
-                <!-- Visual Chart Sold/Activated per Seller -->
-                <div id="wowfi-seller-chart-summary" class="custom-report futuristic-card mb-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h2>Visual Chart for Sold/Activated per Seller</h2>
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#wowfi-seller-chart-content" aria-expanded="false" aria-controls="wowfi-seller-chart-content">
-                            VIEW CHART DATA
-                        </button>
-                    </div>
-                    <div id="wowfi-seller-chart-content" class="collapse mt-3">
-                        <div class="text-center p-3 text-secondary">Loading Seller Chart Data...</div>
-                    </div>
-                </div>
+                <!-- Removed other WowFi Pro elements (Activated, Daily Chart, Seller Chart) -->
 
             </div>
             
@@ -588,9 +551,6 @@
         </div>
     </div>
     <!-- End Modal -->
-
-    <hr>
-    <br>
 
     <footer class="py-3 mt-auto bg-dark">
         <div class="container">
@@ -1665,22 +1625,15 @@ Use of these materials by clients and stakeholders is permitted solely for inter
 
 
             // 3. WOWFI PRO PREPAID REPORTS
-            // FIX: These elements exist within the collapsed wowfipro-view, but their immediate parent elements do not exist yet when the script first runs.
-            // However, since they are children of wowfipro-view, we check if the view is available before accessing the child elements.
-            const wowFiView = document.getElementById('wowfipro-view');
-            if (wowFiView) {
-                // If the container exists, we assume the children exist or will be accessed safely when expanded.
-                setupCollapseListener('wowfi-sold-content', 'WowFi_Sold_Count!A1:B1'); // EDITABLE: No. of Sold Range
-                setupCollapseListener('wowfi-activated-content', 'WowFi_Activated_Count!A1:B1'); // EDITABLE: No. of Activated Range
-                setupCollapseListener('wowfi-daily-chart-content', 'WowFi_Daily_Chart!A1:C10'); // EDITABLE: Daily Chart Data Range
-                setupCollapseListener('wowfi-seller-chart-content', 'WowFi_Seller_Chart!A1:C10'); // EDITABLE: Seller Chart Data Range
-            }
+            // FIX: Use simple data fetch for the single Total Sold metric
+            setupCollapseListener('wowfi-sold-content', 'summaryReports!AE24:AG24', {customHeaders: ['Total Sold']}); 
+            // Removed other WowFi Pro listeners (Activated, Daily Chart, Seller Chart)
 
 
             // 4. SIM SOLD REPORTS
              const simSoldView = document.getElementById('simsold-view');
              if (simSoldView) {
-                setupCollapseListener('simsold-sold-content', 'Sheet2!U24:W24', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: No. of Sold Range
+                setupCollapseListener('simsold-sold-content', 'summaryReports!AE25:AG25', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: No. of Sold Range
                 setupCollapseListener('simsold-activated-content', 'Sheet2!U25:W25', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: No. of Activated Range
                 
                 // --- SIM Sold Charts ---
