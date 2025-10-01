@@ -454,10 +454,10 @@
             <div id="simsold-view" class="view-section" style="display:none;">
                 <h1 class="text-center fw-bold mb-5 gold-accent">SIM Sold Monitoring</h1>
                 
-                <!-- No. of Sold -->
+                <!-- FIX: Renamed and simplified block -->
                 <div id="simsold-sold-summary" class="custom-report futuristic-card mb-4">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h2>No. of Sold</h2>
+                        <h2>Total SIM Sold</h2>
                         <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#simsold-sold-content" aria-expanded="false" aria-controls="simsold-sold-content">
                             VIEW DATA
                         </button>
@@ -466,67 +466,8 @@
                         <div class="text-center p-3 text-secondary">Loading Sold Count Data...</div>
                     </div>
                 </div>
+                <!-- REMOVED: No. of Activated, Visual Chart Sold per Day, Visual Chart Total Sold per Seller, Visual Chart Activated per Seller -->
 
-                <!-- No. of Activated -->
-                <div id="simsold-activated-summary" class="custom-report futuristic-card mb-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h2>No. of Activated</h2>
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#simsold-activated-content" aria-expanded="false" aria-controls="simsold-activated-content">
-                            VIEW DATA
-                        </button>
-                    </div>
-                    <div id="simsold-activated-content" class="collapse mt-3">
-                        <div class="text-center p-3 text-secondary">Loading Activated Count Data...</div>
-                    </div>
-                </div>
-
-                <!-- Visual Chart Sold per Day -->
-                <div id="simsold-daily-chart-summary" class="custom-report futuristic-card mb-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h2>Visual Chart for Sold per Day</h2>
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#simsold-daily-chart-content" aria-expanded="false" aria-controls="simsold-daily-chart-content">
-                            VIEW CHART DATA
-                        </button>
-                    </div>
-                    <!-- ADDED: Canvas element for the Daily Chart -->
-                    <div id="simsold-daily-chart-content" class="collapse mt-3">
-                        <div class="chart-container">
-                            <canvas id="simSoldDailyChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- NEW: Visual Chart Total Sold per Seller -->
-                <div id="simsold-seller-total-chart-summary" class="custom-report futuristic-card mb-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h2>Visual Chart for Total Sold per Seller</h2>
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#simsold-seller-total-chart-content" aria-expanded="false" aria-controls="simsold-seller-total-chart-content">
-                            VIEW CHART DATA
-                        </button>
-                    </div>
-                    <!-- ADDED: Canvas element for the Seller Total Chart -->
-                    <div id="simsold-seller-total-chart-content" class="collapse mt-3">
-                        <div class="chart-container">
-                            <canvas id="simSoldSellerTotalChart"></canvas>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Visual Chart Activated per Seller (Original Block) -->
-                <div id="simsold-seller-chart-summary" class="custom-report futuristic-card mb-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h2>Visual Chart for Activated per Seller</h2>
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#simsold-seller-chart-content" aria-expanded="false" aria-controls="simsold-seller-chart-content">
-                            VIEW CHART DATA
-                        </button>
-                    </div>
-                    <!-- ADDED: Canvas element for the Seller Chart -->
-                    <div id="simsold-seller-chart-content" class="collapse mt-3">
-                        <div class="chart-container">
-                            <canvas id="simSoldSellerChart"></canvas>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -601,7 +542,7 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                 { sheet: 'September 16 to 30, 2025', range: 'A6:R27', endDay: 30 } 
             ],
             '10/2025': [
-                { sheet: 'October 1 to 15, 2025', range: 'A6:R27', endDay: 15 },
+                { sheet: 'October 1 to 15, 2025', range: 'C3:AI17', endDay: 15 },
                 { sheet: 'October 16 to 31, 2025', range: 'C3:AI17', endDay: 31 }
             ]
         };
@@ -1626,45 +1567,21 @@ Use of these materials by clients and stakeholders is permitted solely for inter
 
             // 3. WOWFI PRO PREPAID REPORTS
             // FIX: Use simple data fetch for the single Total Sold metric
-            setupCollapseListener('wowfi-sold-content', 'summaryReports!AE24:AG24', {customHeaders: ['Total Sold']}); 
+            setupCollapseListener('wowfi-sold-content', 'summaryReports!AE24:AG24', {customHeaders: ['Total', 'Target','Achievement']}); 
             // Removed other WowFi Pro listeners (Activated, Daily Chart, Seller Chart)
 
 
             // 4. SIM SOLD REPORTS
              const simSoldView = document.getElementById('simsold-view');
              if (simSoldView) {
-                setupCollapseListener('simsold-sold-content', 'summaryReports!AE25:AG25', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: No. of Sold Range
-                setupCollapseListener('simsold-activated-content', 'Sheet2!U25:W25', {customHeaders: ['Total', 'Target', 'Achievement']}); // EDITABLE: No. of Activated Range
+                // FIX: Renamed listener content and associated button/logic
+                setupCollapseListener('simsold-sold-content', 'summaryReports!AE25:AG25', {customHeaders: ['Total', 'Target', 'Achievement']}); 
                 
-                // --- SIM Sold Charts ---
-                // 4A. Visual Chart for Sold per Day (Line Chart for Time Series Data)
-                setupCollapseListener('simsold-daily-chart-content', 'FSF Monitoring/Report!C3:AI17', { 
-                    type: 'chart', 
-                    canvasId: 'simSoldDailyChart', 
-                    chartTitle: 'SIM Sold Performance per Day (Total Sales)', 
-                    dataLabel: 'Sold Units', 
-                    chartType: 'line',
-                    processingMode: 'daily_total' // New mode for column sums
-                }); 
-                
-                // 4B. Visual Chart for Total Sold per Seller (Bar Chart for Categorical Data)
-                setupCollapseListener('simsold-seller-total-chart-content', 'FSF Monitoring/Report!C3:AI17', { 
-                    type: 'chart', 
-                    canvasId: 'simSoldSellerTotalChart', 
-                    chartTitle: 'Total SIM Sold per Seller (All Dates)', 
-                    dataLabel: 'Total Sold Units', 
-                    chartType: 'bar',
-                    processingMode: 'seller_total' // New mode for row sums
-                });
-
-                // 4C. Visual Chart for Activated per Seller (Original Block)
-                setupCollapseListener('simsold-seller-chart-content', 'Sheet2!D1:E10', { 
-                    type: 'chart', 
-                    canvasId: 'simSoldSellerChart', 
-                    chartTitle: 'SIM Activated Performance per Seller', 
-                    dataLabel: 'Activated Units', 
-                    chartType: 'bar' 
-                });
+                // Removed listeners for: No. of Activated, Sold per Day Chart, Total Sold per Seller Chart, Activated per Seller Chart
+                // setupCollapseListener('simsold-activated-content', 'Sheet2!U25:W25', {customHeaders: ['Total', 'Target', 'Achievement']}); 
+                // setupCollapseListener('simsold-daily-chart-content', 'FSF Monitoring/Report!C3:AI17', {...}); 
+                // setupCollapseListener('simsold-seller-total-chart-content', 'FSF Monitoring/Report!C3:AI17', {...}); 
+                // setupCollapseListener('simsold-seller-chart-content', 'Sheet2!D1:E10', {...}); 
             }
         }
 
@@ -1677,4 +1594,3 @@ Use of these materials by clients and stakeholders is permitted solely for inter
     </script>
 </body>
 </html>
-
