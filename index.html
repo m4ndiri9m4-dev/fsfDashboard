@@ -262,6 +262,18 @@
                             <i class="fas fa-sim-card gold-accent"></i> SIM Sold
                         </a>
                     </li>
+                    <!-- NEW: About Link -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" onclick="switchView('about')">
+                            <i class="fas fa-info-circle gold-accent"></i> About
+                        </a>
+                    </li>
+                    <!-- NEW: Contact Link (Opens GMail Composer) -->
+                    <li class="nav-item">
+                        <a class="nav-link" href="mailto:ella@ccmgi.com.ph?subject=Suggestions/Concerns%20about%20FSF%20Dashboard" target="_blank">
+                            <i class="fas fa-envelope gold-accent"></i> Contact
+                        </a>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -469,6 +481,57 @@
                 <!-- REMOVED: No. of Activated, Visual Chart Sold per Day, Visual Chart Total Sold per Seller, Visual Chart Activated per Seller -->
 
             </div>
+
+            <!-- ============================================== -->
+            <!-- 5. ABOUT/CONTACT SECTION                       -->
+            <!-- ============================================== -->
+            <div id="about-view" class="view-section" style="display:none;">
+                <h1 class="text-center fw-bold mb-5 gold-accent">About & Developer Contact</h1>
+                <div class="futuristic-card mb-4">
+                    <h2 class="text-white mb-4">Application Description</h2>
+                    <p class="text-white-50" style="text-align: justify; font-size: 0.95rem;">
+                        This **FSF Dashboard** serves as a centralized, real-time visualization platform designed to streamline monitoring of field sales force operations, covering key metrics like deployment rates, manpower attendance, and product sales performance against daily targets. It provides mission-critical data access for timely strategic decisions by the CCMGI Project Coordinator.
+                    </p>
+                </div>
+                
+                <div class="futuristic-card mb-4">
+                    <h2 class="text-white mb-4">Developer Credits & Information</h2>
+                    <div class="d-flex justify-content-between align-items-start mb-3 border-bottom border-secondary pb-3">
+                        <div>
+                            <p class="fw-bold gold-accent mb-0">Developer</p>
+                            <!-- UPDATED DEVELOPER NAME -->
+                            <p class="text-white">Harold Loteyro (ᜑᜇᜓᜎ᜔)</p> 
+                        </div>
+                        <div class="text-end">
+                            <p class="fw-bold gold-accent mb-0">Technologies Used</p>
+                            <p class="text-white">HTML5, CSS3, JavaScript, Bootstrap 5, Google Sheets API</p>
+                        </div>
+                    </div>
+
+                    <div class="mb-4">
+                        <p class="fw-bold gold-accent mb-1">Business Inquiries & Collaboration</p>
+                        <p class="text-white-50">I am available for freelance projects to develop similar real-time dashboards and data visualization tools for your business needs.</p>
+                        <p class="text-white mb-1">
+                            <i class="fas fa-envelope gold-accent me-2"></i> **Email:** <a href="mailto:m4ndiri9m4.dev@gmail.com?subject=Business%20Inquiry%20from%20FSF%20Dashboard" class="text-warning">m4ndiri9m4.dev@gmail.com</a>
+                        </p>
+                        <p class="text-white mb-1">
+                            <i class="fas fa-phone gold-accent me-2"></i> **Cell/Viber:** 09910120963 / 09939580509
+                        </p>
+                        <p class="text-white">
+                            <i class="fas fa-user-tag gold-accent me-2"></i> **Credit Description:** develop by: m4ndiri9m4
+                        </p>
+                    </div>
+
+                    <div class="mt-4">
+                        <p class="fw-bold gold-accent mb-1">Suggestions & Concerns (Contact Site Owner)</p>
+                        <p class="text-white-50">If you have suggestions, concerns, or bug reports regarding the functionality or data of this specific FSF Dashboard, please contact the site owner via email.</p>
+                        <a href="mailto:ella@ccmgi.com.ph?subject=FSF%20Dashboard%20Feedback%20for%20Gracelle" class="btn btn-warning mt-2">
+                            <i class="fas fa-comments me-2"></i> Send Message to Owner
+                        </a>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
     <!-- End Main Container -->
@@ -495,6 +558,14 @@
 
     <footer class="py-3 mt-auto bg-dark">
         <div class="container">
+            <!-- App Description -->
+            <p class="m-0 text-center text-white-50" style="color: #FFBF00 !important; font-size: 0.8rem;">
+                <!-- Used Bootstrap text-center for block-level centering of content -->
+                <span style="display: block; text-align: justify; margin: 0 auto; max-width: 90%;">
+                    **Application Description:** This FSF Dashboard serves as a centralized, real-time visualization platform designed to streamline monitoring of field sales force operations, covering key metrics like deployment rates, manpower attendance, and product sales performance against daily targets. It provides mission-critical data access for timely strategic decisions by the CCMGI Project Coordinator.
+                </span>
+            </p>
+
             <!-- Main IP Statement Paragraph -->
             <p class="m-0 text-center text-white-50" style="color: #FFBF00 !important; font-size: 0.8rem;">
                 <!-- Used Bootstrap text-center for block-level centering of content -->
@@ -504,9 +575,15 @@ Unauthorized reproduction, distribution, modification, or commercial use of any 
 Use of these materials by clients and stakeholders is permitted solely for internal review and decision-making purposes. Any external sharing or publication must be explicitly approved.
                 </span>
             </p>
+            
             <!-- Separate Copyright Line, now in silver and bold -->
             <p class="m-0 text-center fw-bold" style="color: #C0C0C0 !important;">
                 © 2025 Gracelle Anne Magnaye, CCMGI. All rights reserved.
+            </p>
+
+            <!-- Developer Credit (Updated with right alignment and font size) -->
+            <p class="m-0 text-end" style="color: #FFD700 !important; font-size: 0.8em;">
+                <span style="font-size: 0.7em; font-weight: bold;">Developed by: </span>M4NDIRI9M4
             </p>
         </div>
     </footer>
@@ -1471,6 +1548,8 @@ Use of these materials by clients and stakeholders is permitted solely for inter
             let targetId;
             if (viewId === 'home') {
                 targetId = 'home-view';
+            } else if (viewId === 'about') {
+                targetId = 'about-view'; // Added About view
             } else {
                 targetId = `${viewId}-view`;
             }
