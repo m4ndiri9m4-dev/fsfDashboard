@@ -344,14 +344,13 @@
             <!-- 1. PROJECT FSF MASTER SECTION (New Hub)        -->
             <!-- ============================================== -->
             <div id="project-fsf-view" class="view-section" style="display:none;">
-                <h1 class="text-center fw-bold mb-5 gold-accent">Project FSF Monitoring Hub</h1>
+                <h1 class="text-center fw-bold mb-5 gold-accent">Project FSF</h1>
                 
-                <!-- START SECTION: MANDAYS AND ATTENDANCE MONITORING (New Wrapper) -->
-                <!-- REMOVED text header: <h3 class="text-center fw-bold mb-4 gold-accent" style="color:#EC4899 !important;">Mandays & Attendance Monitoring</h3> -->
+                <!-- START SECTION: MANDAYS AND ATTENDANCE MONITORING -->
                 <div id="mandays-monitoring-wrapper" class="futuristic-card mb-5">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h2 class="mb-0">
-                            <!-- Mandays Icon (Updated to Image) -->
+                            <!-- Mandays Icon as Title -->
                             <img src="mandays.png" alt="Mandays Monitoring" class="section-header-img gold-accent me-2"> Mandays Monitoring
                         </h2>
                         <!-- Collapse Toggle Button for Sub-options -->
@@ -371,7 +370,7 @@
                                 </button>
                             </div>
                             
-                            <!-- Button: Daily Attendance Calendar (REPLACED DAILY DEPLOYMENT) -->
+                            <!-- Button: Daily Attendance Calendar -->
                             <div class="col-12">
                                 <button class="btn btn-primary w-100 fw-bold" onclick="showMandaysReport('daily_calendar')">
                                     <i class="fas fa-calendar-day me-1"></i> Daily Attendance Calendar
@@ -398,77 +397,77 @@
                 </div>
                 <!-- END SECTION: MANDAYS AND ATTENDANCE MONITORING -->
 
-                <h3 class="text-center fw-bold mb-4 gold-accent" style="color:#EC4899 !important;">Postpaid Reporting</h3>
                 
-                <!-- POSTPAID BLOCKS -->
-                <div id="postpaid-total-processed-summary" class="custom-report futuristic-card mb-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <!-- Postpaid Icon (Updated to Image) -->
-                        <h2>Total Applications Processed</h2>
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#postpaid-total-processed-content" aria-expanded="false" aria-controls="postpaid-total-processed-content">
-                            VIEW DATA
+                <!-- START SECTION: POSTPAID MONITORING (New Wrapper) -->
+                <h3><img src="postpaid.png" alt="Mandays Monitoring" class="section-header-img gold-accent me-2"> Postpaid Monitoring</h3>
+                <div id="postpaid-monitoring-wrapper" class="futuristic-card mb-5">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="mb-0">
+                            <!-- Postpaid Icon as Title -->
+                            <i class="fas fa-wifi gold-accent section-header-img"></i> Postpaid Monitoring
+                        </h2>
+                        <!-- Collapse Toggle Button for Sub-options -->
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#postpaid-sub-menu" aria-expanded="false" aria-controls="postpaid-sub-menu">
+                            VIEW OPTIONS
                         </button>
                     </div>
-                    <div id="postpaid-total-processed-content" class="collapse mt-3">
-                        <div class="text-center p-3 text-secondary">Loading Processed Applications Data...</div>
-                    </div>
-                </div>
 
-                <div id="postpaid-total-approved-summary" class="custom-report futuristic-card mb-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h2>Total Applications Approved</h2>
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#postpaid-total-approved-content" aria-expanded="false" aria-controls="postpaid-total-approved-content">
-                            VIEW DATA
-                        </button>
-                    </div>
-                    <div id="postpaid-total-approved-content" class="collapse mt-3">
-                        <div class="text-center p-3 text-secondary">Loading Total Approved Data...</div>
-                    </div>
-                </div>
+                    <!-- Postpaid Sub-menu Container -->
+                    <div id="postpaid-sub-menu" class="collapse">
+                        <div class="row g-2 p-3 border border-secondary rounded-lg">
+                            <!-- Target for the metrics output -->
+                            <div id="postpaid-report-output" class="col-12 mb-3">
+                                <div class="text-center p-3 text-white-50">Select a report option below.</div>
+                            </div>
 
-                <div id="postpaid-total-installed-summary" class="custom-report futuristic-card mb-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h2>Total Applications Installed</h2>
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#postpaid-total-installed-content" aria-expanded="false" aria-controls="postpaid-total-installed-content">
-                            VIEW DATA
-                        </button>
-                    </div>
-                    <div id="postpaid-total-installed-content" class="collapse mt-3">
-                        <div class="text-center p-3 text-secondary">Loading Total Installed Data...</div>
-                    </div>
-                </div>
+                            <!-- Total Applications Submitted -->
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100 fw-bold" onclick="showPostpaidReport('total_submitted')">
+                                    <i class="fas fa-file-upload me-1"></i> Total Applications Submitted
+                                </button>
+                            </div>
 
-                <div id="postpaid-pending-install-summary" class="custom-report futuristic-card mb-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h2>Total Pending Installation</h2>
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#postpaid-pending-install-content" aria-expanded="false" aria-controls="postpaid-pending-install-content">
-                            VIEW DATA
-                        </button>
-                    </div>
-                    <div id="postpaid-pending-install-content" class="collapse mt-3">
-                        <div class="text-center p-3 text-secondary">Loading Pending Installation Data...</div>
-                    </div>
-                </div>
+                            <!-- Total Applications Approved -->
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100 fw-bold" onclick="showPostpaidReport('total_approved')">
+                                    <i class="fas fa-check-circle me-1"></i> Total Applications Approved
+                                </button>
+                            </div>
+                            
+                            <!-- Total Applications Installed -->
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100 fw-bold" onclick="showPostpaidReport('total_installed')">
+                                    <i class="fas fa-wrench me-1"></i> Total Applications Installed
+                                </button>
+                            </div>
 
-                <div id="postpaid-pending-approval-summary" class="custom-report futuristic-card mb-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h2>Total Pending Approval</h2>
-                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#postpaid-pending-approval-content" aria-expanded="false" aria-controls="postpaid-pending-approval-content">
-                            VIEW DATA
-                        </button>
-                    </div>
-                    <div id="postpaid-pending-approval-content" class="collapse mt-3">
-                        <div class="text-center p-3 text-secondary">Loading Pending Approval Data...</div>
+                            <!-- Total Pending Installation -->
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100 fw-bold" onclick="showPostpaidReport('pending_install')">
+                                    <i class="fas fa-clock me-1"></i> Total Pending Installation
+                                </button>
+                            </div>
+
+                            <!-- Total Pending Approval -->
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100 fw-bold" onclick="showPostpaidReport('pending_approval')">
+                                    <i class="fas fa-hourglass-half me-1"></i> Total Pending Approval
+                                </button>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
+                <!-- END SECTION: POSTPAID MONITORING -->
+
                 
-                <h3 class="text-center fw-bold mb-4 mt-5 gold-accent" style="color:#EC4899 !important;">WowFi Pro Reporting</h3>
+                <h3><img src="mandays.png" alt="Mandays Monitoring" class="section-header-img gold-accent me-2">WowFi Pro Monitoring</h3>
 
                 <!-- WOWFI PRO BLOCKS -->
                 <div id="wowfi-sold-summary" class="custom-report futuristic-card mb-4">
                     <div class="d-flex justify-content-between align-items-center">
-                        <!-- WowFi Pro Icon (Updated to Image) -->
-                        <h2><img src="wowfipro.png" alt="WowFi Pro Icon" class="report-icon-img"> Total WowFi Pro Sold</h2>
+                        <!-- WowFi Pro Icon (Replaced with Font Awesome) -->
+                        <h2><i class="fas fa-box-open gold-accent section-header-img"></i> Total WowFi Pro Sold</h2>
                         <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#wowfi-sold-content" aria-expanded="false" aria-controls="wowfi-sold-content">
                             VIEW DATA
                         </button>
@@ -483,8 +482,8 @@
                 <!-- SIM SOLD BLOCKS -->
                 <div id="simsold-sold-summary" class="custom-report futuristic-card mb-4">
                     <div class="d-flex justify-content-between align-items-center">
-                        <!-- SIM Sold Icon (Updated to Image) -->
-                        <h2><img src="simsold.png" alt="SIM Sold Icon" class="report-icon-img"> Total SIM Sold</h2>
+                        <!-- SIM Sold Icon (Replaced with Font Awesome) -->
+                        <h2><i class="fas fa-sim-card gold-accent section-header-img"></i> Total SIM Sold</h2>
                         <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#simsold-sold-content" aria-expanded="false" aria-controls="simsold-sold-content">
                             VIEW DATA
                         </button>
@@ -629,6 +628,16 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                 // NOTE: Add 'October 16 to 31, 2025!A6:R27' here when you have that sheet ready!
             ]
         };
+        
+        // 4. POSTPAID REPORT CONFIGURATION
+        const POSTPAID_CONFIG = {
+            'total_submitted': { range: 'summaryReports!AE16:AG16', headers: ['Total', 'Target', 'Achievement'] },
+            'total_approved': { range: 'summaryReports!AE17:AG17', headers: ['Total', 'Target', 'Achievement'] },
+            'total_installed': { range: 'summaryReports!AE18:AG18', headers: ['Total', 'Target', 'Achievement'] },
+            'pending_install': { range: 'summaryReports!AE19:AG19', headers: ['Total', 'Target', 'Achievement'] },
+            'pending_approval': { range: 'summaryReports!AE20:AG20', headers: ['Total', 'Target', 'Achievement'] },
+        };
+
 
         let attendanceDataCache = {}; // Cache stores combined data per period key ('9/2025')
         let currentCalendarDate = new Date(2025, 8, 1); // Tracks the currently displayed month/year for the calendar (starts Sept 1, 2025)
@@ -1204,15 +1213,47 @@ Use of these materials by clients and stakeholders is permitted solely for inter
         }
         
         /**
+         * Handles clicks for the Postpaid sub-reports.
+         * @param {string} reportType - The type of report to show ('total_submitted', 'total_approved', etc.).
+         */
+        async function showPostpaidReport(reportType) {
+            const outputElement = document.getElementById('postpaid-report-output');
+            outputElement.innerHTML = '<div class="text-center p-3 text-secondary"><i class="fas fa-spinner fa-spin gold-accent me-2"></i> Loading report...</div>';
+
+            const config = POSTPAID_CONFIG[reportType];
+            if (!config) {
+                outputElement.innerHTML = `<div class="alert alert-warning">Invalid Postpaid report selected.</div>`;
+                return;
+            }
+            
+            // Generate a simple key for the report title
+            const reportTitle = reportType.replace(/_/g, ' ').toUpperCase();
+            
+            // Call the general fetcher function
+            await fetchAndRender(
+                SPREADSHEET_ID,
+                config.range,
+                'postpaid-report-output', // Target the dedicated output div
+                config.headers
+            );
+
+            // After rendering the table, update the title/description area
+            outputElement.insertAdjacentHTML('afterbegin', `<h4 class="gold-accent mb-3">${reportTitle}</h4><hr class="border-secondary">`);
+        }
+        
+        
+        /**
          * Fetches data from Google Sheets and renders it as an HTML table.
          */
         async function fetchAndRender(spreadsheetId, range, targetId, customHeaders = null) {
             const targetElement = document.getElementById(targetId);
+            // Show loading state, but preserve the original "Select a report" text temporarily
+            const originalContent = targetElement.innerHTML;
+            targetElement.innerHTML = '<div class="text-center p-3 text-secondary"><i class="fas fa-spinner fa-spin gold-accent me-2"></i> Loading data from Google Sheets...</div>';
+
             // Use the standard Sheets API for raw table data
             const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
             
-            // Show loading state
-            targetElement.innerHTML = '<div class="text-center p-3 text-secondary"><i class="fas fa-spinner fa-spin gold-accent me-2"></i> Loading data from Google Sheets...</div>';
 
             try {
                 const response = await fetch(url);
@@ -1230,6 +1271,8 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                 }
 
                 const rows = data.values;
+                // Clear the target element completely before inserting the table (to avoid stacking)
+                targetElement.innerHTML = ''; 
                 let html = '<div class="table-responsive"><table class="table table-dark table-bordered"><thead><tr>';
                 
                 // Determine headers and data rows
@@ -1237,7 +1280,7 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                 let dataRows = [];
 
                 if (customHeaders && customHeaders.length > 0) {
-                    // Use custom headers and treat all fetched rows as data
+                    // Use custom headers and assume the single fetched row contains the data
                     headers = customHeaders;
                     dataRows = rows;
                 } else {
@@ -1438,6 +1481,10 @@ Use of these materials by clients and stakeholders is permitted solely for inter
             }
 
             element.addEventListener('show.bs.collapse', function () {
+                // Since Postpaid logic is moved to showPostpaidReport, 
+                // we only need to handle the non-Postpaid items here.
+                if (contentId.includes('postpaid')) return;
+
                 // Check if content already exists to prevent repeated API calls/rendering
                 if (this.querySelector('.table-responsive') === null && this.querySelector('.chart-container') === null) {
                     if (config.type === 'chart') {
@@ -1470,14 +1517,8 @@ Use of these materials by clients and stakeholders is permitted solely for inter
 
         function initializeListeners() {
             // NOTE: Mandays listeners are handled by the showMandaysReport function now.
+            // NOTE: Postpaid listeners are handled by showPostpaidReport and no longer need individual setupCollapseListener calls.
 
-            // 2. POSTPAID REPORTS 
-            setupCollapseListener('postpaid-total-processed-content', 'summaryReports!AE16:AG16', {customHeaders: ['Total', 'Target', 'Achievement']}); 
-            setupCollapseListener('postpaid-total-approved-content', 'summaryReports!AE17:AG17', {customHeaders: ['Total', 'Target', 'Achievement']});
-            setupCollapseListener('postpaid-total-installed-content', 'summaryReports!AE18:AG18', {customHeaders: ['Total', 'Target', 'Achievement']});    
-            setupCollapseListener('postpaid-pending-install-content', 'summaryReports!AE19:AG19', {customHeaders: ['Total', 'Target', 'Achievement']});    
-            setupCollapseListener('postpaid-pending-approval-content', 'summaryReports!AE20:AG20', {customHeaders: ['Total', 'Target', 'Achievement']});
-            
             // 3. WOWFI PRO PREPAID REPORTS
             setupCollapseListener('wowfi-sold-content', 'summaryReports!AE24:AG24', {customHeaders: ['Total', 'Target','Achievement']}); 
 
@@ -1494,4 +1535,3 @@ Use of these materials by clients and stakeholders is permitted solely for inter
     </script>
 </body>
 </html>
-
