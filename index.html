@@ -23,6 +23,7 @@
         body {
             font-family: 'Orbitron', sans-serif;
             background-image: url('elle_logo.png');
+            background-position: center;
             color: white;
             min-height: 100vh;
             padding-top: 70px; /* Space for fixed navbar */
@@ -376,7 +377,7 @@
                             <!-- Button: Attendance Per Seller (Total List) -->
                             <div class="col-12">
                                 <button class="btn btn-primary w-100 fw-bold" onclick="showMandaysReport('attendance_per_seller')">
-                                    <i class="fas fa-user-check me-1"></i> Attendance Per Seller (Total List)
+                                    <i class="fas fa-user-check me-1"></i> Total Deployment per Sellers (Percentage)
                                 </button>
                             </div>
                             
@@ -390,7 +391,7 @@
                             <!-- Button: Total Deployment per Month (TL, Sellers) (Monthly Table) -->
                             <div class="col-12">
                                 <button class="btn btn-primary w-100 fw-bold" onclick="showMandaysReport('monthly_deployment')">
-                                    <i class="fas fa-chart-bar me-1"></i> Total Deployment per Month (TL, Sellers)
+                                    <i class="fas fa-chart-bar me-1"></i> Total Deployment of the Month (TL, Sellers)
                                 </button>
                             </div>
                             
@@ -409,7 +410,6 @@
 
                 
                 <!-- START SECTION: POSTPAID MONITORING (New Wrapper) -->
-                <!-- REMOVED TITLE: <h3 class="text-center fw-bold mb-4 gold-accent" style="color:#EC4899 !important;">Postpaid Reporting</h3> -->
                 <div id="postpaid-monitoring-wrapper" class="futuristic-card mb-5">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h2 class="mb-0">
@@ -471,13 +471,11 @@
                 <!-- END SECTION: POSTPAID MONITORING -->
 
                 
-                <!-- REMOVED TITLE: <h3 class="text-center fw-bold mb-4 mt-5 gold-accent" style="color:#EC4899 !important;">WowFi Pro Reporting</h3> -->
-
                 <!-- WOWFI PRO BLOCKS -->
                 <div id="wowfi-sold-summary" class="custom-report futuristic-card mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <!-- WowFi Pro Image as Title Button -->
                         <h2 class="mb-0">
+                            <!-- WowFi Pro Image as Title Button -->
                             <img src="wowfipro.png" alt="WowFi Pro Monitoring Logo" class="image-header-button" style="height: 50px; width: auto; margin: 0;">
                         </h2>
                         <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#wowfi-sold-content" aria-expanded="false" aria-controls="wowfi-sold-content">
@@ -489,13 +487,11 @@
                     </div>
                 </div>
                 
-                <!-- REMOVED TITLE: <h3 class="text-center fw-bold mb-4 mt-5 gold-accent" style="color:#EC4899 !important;">SIM Sold Reporting</h3> -->
-
                 <!-- SIM SOLD BLOCKS -->
                 <div id="simsold-sold-summary" class="custom-report futuristic-card mb-4">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <!-- SIM Sold Image as Title Button -->
                         <h2 class="mb-0">
+                            <!-- SIM Sold Image as Title Button -->
                             <img src="simsold.png" alt="SIM Sold Monitoring Logo" class="image-header-button" style="height: 50px; width: auto; margin: 0;">
                         </h2>
                         <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#simsold-sold-content" aria-expanded="false" aria-controls="simsold-sold-content">
@@ -591,6 +587,23 @@
         </div>
     </div>
     <!-- End Modal -->
+
+    <br>
+    <br>
+    <br>
+
+    <br>
+    <br>
+    <br>
+
+    <br>
+    <br>
+    <br>
+
+
+    <br>
+    <br>
+    <br>
 
     <footer class="py-3 mt-auto bg-dark">
         <div class="container">
@@ -967,6 +980,52 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                 
                 // Assuming Designation is at index 2, and Dates start at index 3
                 const dateColumnsStart = 3; 
+                const dateHeaders = headerRow.slice(dateColumnsStart);
+
+                // --- DYNAMIC TARGET CALCULATION ---
+                let workingDaysCount = 0; // Days that are NOT Sunday and NOT a specified holiday
+                const dailySellerTarget = 8;
+                const dailyTLTarget = 1;
+                
+                // Specific non-deployment days for September 2025 (Month Index 8)
+                const nonDeploymentDaysSept = [7, 8, 9, 15]; // Day of the month: Sept 7, 8, 9, 15
+
+                dateHeaders.forEach(dateHeaderString => {
+                    // Attempt to parse the date from the header (e.g., "9/1/2025")
+                    const date = new Date(dateHeaderString);
+                    
+                    if (!isNaN(date) && date.getTime() > 0) {
+                        const dayOfWeek = date.getDay(); // 0 = Sunday
+                        const dayOfMonth = date.getDate();
+                        const monthIndex = date.getMonth();
+                        
+                        let isWorkingDay = true;
+
+                        // 1. Check if Sunday
+                        if (dayOfWeek === 0) {
+                            isWorkingDay = false;
+                        }
+
+                        // 2. Check specific September exceptions (only if viewing September)
+                        if (isWorkingDay && monthIndex === 8 && year === 2025) { // Month 8 is September
+                            if (nonDeploymentDaysSept.includes(dayOfMonth)) {
+                                isWorkingDay = false;
+                            }
+                        }
+                        
+                        if (isWorkingDay) {
+                            workingDaysCount++;
+                        }
+                    }
+                });
+
+                const calculatedTLTarget = workingDaysCount * dailyTLTarget;
+                const calculatedSellerTarget = workingDaysCount * dailySellerTarget;
+
+                // Use calculated targets
+                const tlTarget = calculatedTLTarget;
+                const sellerTarget = calculatedSellerTarget;
+                // --- END DYNAMIC TARGET CALCULATION ---
 
                 sellerRows.forEach(row => {
                     const designation = (row[2] || '').trim().toUpperCase();
@@ -987,10 +1046,11 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                         }
                     }
                 });
+                
+                // Calculate percentages
+                const tlDeploymentPercent = tlTarget > 0 ? (totalTLAttendance / tlTarget) * 100 : 0;
+                const sellerDeploymentPercent = sellerTarget > 0 ? (totalSellerAttendance / sellerTarget) * 100 : 0;
 
-                // NOTE: Targets are hardcoded based on previous user input (Sept 2025 structure)
-                const tlTarget = 23; 
-                const sellerTarget = 176; 
 
                 outputElement.innerHTML = `
                     <div class="p-4">
@@ -1001,11 +1061,13 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                                 <h5 class="text-white">Team Leader (TL)</h5>
                                 <p class="mb-1">Present Mandays: <span class="fw-bold text-success">${totalTLAttendance}</span></p>
                                 <p class="mb-1 text-white-50">Target Mandays: ${tlTarget}</p>
+                                <p class="mb-1 text-warning fw-bold">Deployment %: ${tlDeploymentPercent.toFixed(1)}%</p>
                             </div>
                             <div class="col-md-6 mb-3">
                                 <h5 class="text-white">Sellers</h5>
                                 <p class="mb-1">Present Mandays: <span class="fw-bold text-success">${totalSellerAttendance}</span></p>
                                 <p class="mb-1 text-white-50">Target Mandays: ${sellerTarget}</p>
+                                <p class="mb-1 text-warning fw-bold">Deployment %: ${sellerDeploymentPercent.toFixed(1)}%</p>
                             </div>
                         </div>
                     </div>
