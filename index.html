@@ -5,7 +5,7 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     
-    <title>FSF Dashboard | Live Data Monitor</title>
+    <title>ELLE, CCMGI | Live Data Monitor</title>
 
     <!-- Bootstrap CSS -->
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.8/dist/css/bootstrap.min.css" xintegrity="sha384-sRIl4kxILFvY47J16cr9ZwB07vP4J8+LH7qKQnuqkuIAvNWLzeN8tE5YBujZqJLB" crossorigin="anonymous">
@@ -96,9 +96,15 @@
             box-shadow: 0 0 25px rgba(255, 215, 0, 0.9);
             background-color: rgba(79, 70, 229, 0.8);
         }
-        .grid-button i {
-            font-size: 3rem;
+        /* NEW: Styles for image icons replacing Font Awesome icons */
+        .grid-button .icon-img {
+            width: 70px; /* Standard size for large grid icons */
+            height: 70px;
             margin-bottom: 10px;
+            border-radius: 50%;
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 5px;
+            object-fit: contain;
         }
         .grid-button span {
             font-size: 1.1rem;
@@ -106,6 +112,15 @@
             color: white;
             text-shadow: 0 0 5px #FFD700;
         }
+        /* NEW: Styles for icons inside report buttons */
+        .report-icon-img {
+            height: 24px;
+            width: 24px;
+            margin-right: 8px;
+            object-fit: contain;
+        }
+
+
         .chart-container {
             position: relative;
             height: 40vh; /* Set a default height for responsiveness */
@@ -228,6 +243,13 @@
             cursor: pointer;
             padding: 0 10px;
         }
+        /* Custom CSS for the logo image */
+        .navbar-logo {
+            height: 40px; /* Set a fixed height for the logo */
+            width: auto;
+            max-width: 150px; /* Ensure it doesn't get too wide on small screens */
+            display: block;
+        }
 
     </style>
 </head>
@@ -236,8 +258,10 @@
     <!-- Start Navigation -->
     <nav class="navbar fixed-top navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
-            <!-- Clicking the title returns to Home -->
-            <a class="navbar-brand gold-accent" href="#" onclick="switchView('home')">FSF Dashboard by Elle</a>
+            <!-- Navbar Brand: Replaced text with image -->
+            <a class="navbar-brand" href="#" onclick="switchView('home')">
+                <img src="elle_logo.png" alt="ELLE, CCMGI-ERP Logo" class="navbar-logo">
+            </a>
             <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -245,10 +269,10 @@
             <!-- Start Links -->
             <div class="collapse navbar-collapse" id="navbarResponsive">
                 <ul class="navbar-nav ms-auto">
-                    <!-- Home -->
+                    <!-- Home (Updated Icon to Image) -->
                     <li class="nav-item">
                         <a class="nav-link" href="#" onclick="switchView('home')">
-                            <i class="fas fa-home gold-accent"></i> Home
+                            <img src="home.png" alt="Home Icon" class="report-icon-img"> Home
                         </a>
                     </li>
                     <!-- About -->
@@ -317,7 +341,10 @@
                 <h3 class="text-center fw-bold mb-4 gold-accent" style="color:#EC4899 !important;">Mandays & Attendance Monitoring</h3>
                 <div id="mandays-monitoring-wrapper" class="futuristic-card mb-5">
                     <div class="d-flex justify-content-between align-items-center mb-3">
-                        <h2 class="mb-0"><i class="fas fa-calendar-alt gold-accent me-2"></i> Mandays Monitoring</h2>
+                        <h2 class="mb-0">
+                            <!-- Mandays Icon (Updated to Image) -->
+                            <img src="mandays.jpg" alt="Mandays Icon" class="report-icon-img gold-accent me-2"> Mandays Monitoring
+                        </h2>
                         <!-- Collapse Toggle Button for Sub-options -->
                         <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#mandays-sub-menu" aria-expanded="false" aria-controls="mandays-sub-menu">
                             VIEW OPTIONS
@@ -351,6 +378,9 @@
                             
                             <!-- Container for report output -->
                             <div id="mandays-report-output" class="col-12 mt-3">
+                                <div class="alert alert-info text-center fw-bold">
+                                    <i class="fas fa-info-circle me-1"></i> Note: For Monthly Totals, first use the **Daily Attendance Calendar** button and navigate to the desired month (e.g., October 2025).
+                                </div>
                                 <div class="text-center p-3 text-white-50">Select a report option above.</div>
                             </div>
 
@@ -364,7 +394,8 @@
                 <!-- POSTPAID BLOCKS -->
                 <div id="postpaid-total-processed-summary" class="custom-report futuristic-card mb-4">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h2>Total Applications Processed</h2>
+                        <!-- Postpaid Icon (Updated to Image) -->
+                        <h2><img src="postpaid.jpg" alt="Postpaid Icon" class="report-icon-img"> Total Applications Processed</h2>
                         <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#postpaid-total-processed-content" aria-expanded="false" aria-controls="postpaid-total-processed-content">
                             VIEW DATA
                         </button>
@@ -427,7 +458,8 @@
                 <!-- WOWFI PRO BLOCKS -->
                 <div id="wowfi-sold-summary" class="custom-report futuristic-card mb-4">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h2>Total WowFi Pro Sold</h2>
+                        <!-- WowFi Pro Icon (Updated to Image) -->
+                        <h2><img src="wowfipro.png" alt="WowFi Pro Icon" class="report-icon-img"> Total WowFi Pro Sold</h2>
                         <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#wowfi-sold-content" aria-expanded="false" aria-controls="wowfi-sold-content">
                             VIEW DATA
                         </button>
@@ -442,7 +474,8 @@
                 <!-- SIM SOLD BLOCKS -->
                 <div id="simsold-sold-summary" class="custom-report futuristic-card mb-4">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h2>Total SIM Sold</h2>
+                        <!-- SIM Sold Icon (Updated to Image) -->
+                        <h2><img src="simsold.png" alt="SIM Sold Icon" class="report-icon-img"> Total SIM Sold</h2>
                         <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#simsold-sold-content" aria-expanded="false" aria-controls="simsold-sold-content">
                             VIEW DATA
                         </button>
@@ -476,12 +509,31 @@
             </div>
 
             <!-- ============================================== -->
-            <!-- 4. ABOUT SECTION (Placeholder)                 -->
+            <!-- 4. ABOUT SECTION (Description and Developer Details) -->
             <!-- ============================================== -->
             <div id="about-view" class="view-section" style="display:none;">
                 <h1 class="text-center fw-bold mb-5 gold-accent">About the Dashboard</h1>
-                <div class="futuristic-card p-4">
-                    <p>This is a live data monitoring tool built for the FSF Project, designed to provide real-time performance insights through direct connection to Google Sheets.</p>
+                <div class="futuristic-card p-4 mb-4">
+                    <h2 class="gold-accent mb-3">System Overview: FSF Dashboard</h2>
+                    <p>This is a custom, mobile-first **Live Data Monitoring Tool** built specifically for the **FSF Project**. Its primary function is to provide the Project Coordinator and stakeholders with **real-time performance insights** pulled directly from linked Google Sheets.</p>
+                    <p>The system features dynamic, responsive reporting for Manpower/Attendance tracking and Sales/Application monitoring for Postpaid Home WiFi, WowFi Pro, and SIM sales across various projects.</p>
+                </div>
+                
+                <div class="futuristic-card p-4 mb-4">
+                    <h2 class="gold-accent mb-3">Developer Credit & Contact</h2>
+                    <h4 class="text-white mb-3">Harold Loteyro (<span class="text-warning">M4NDIRI9M4</span>)</h4>
+                    
+                    <p class="fs-6 text-white-50 fw-bold">
+                        <i class="fas fa-laptop-code me-2 text-warning"></i> 
+                        Available for **Freelance Development Services**.
+                        <br>
+                        Reach out if you need custom dashboards, automation, or web solutions!
+                    </p>
+                    <hr class="border-secondary my-3">
+                    
+                    <p class="mb-1"><i class="fas fa-mobile-alt me-2 text-warning"></i> <strong>Cell#:</strong> 09910120963</p>
+                    <p class="mb-1"><i class="fab fa-viber me-2 text-warning"></i> <strong>Viber#:</strong> 09939580509</p>
+                    <p class="mb-1"><i class="fas fa-envelope me-2 text-warning"></i> <strong>Email:</strong> m4ndiri9m4.dev@gmail.com</p>
                 </div>
             </div>
 
@@ -533,6 +585,11 @@ Use of these materials by clients and stakeholders is permitted solely for inter
             <p class="m-0 text-center fw-bold" style="color: #C0C0C0 !important;">
                 © 2025 Gracelle Anne Magnaye, CCMGI. All rights reserved.
             </p>
+            <!-- New Developed By Line (MOVED TO BOTTOM) -->
+            <!-- FIX: Added developer name here as well for visibility -->
+            <p class="m-0 text-center text-white-50" style="font-size: 0.8em;">
+                Developed by: Harold Loteyro (M4NDIRI9M4)
+            </p>
         </div>
     </footer>
 
@@ -557,12 +614,15 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                 { sheetRange: 'September 1 to 15, 2025!A6:R18', startDay: 1, endDay: 15, sheetName: 'September 1 to 15, 2025' },
                 { sheetRange: 'September 16 to 30, 2025!A6:R27', startDay: 16, endDay: 30, sheetName: 'September 16 to 30, 2025' }
             ],
-            // Add other months/periods as needed here
+            // FIX: Correctly defining the October configuration.
+            '10/2025': [
+                { sheetRange: 'October 1 to 15, 2025!A6:R27', startDay: 1, endDay: 15, sheetName: 'October 1 to 15, 2077' }
+                // NOTE: Add 'October 16 to 31, 2025!A6:R27' here when you have that sheet ready!
+            ]
         };
 
         let attendanceDataCache = {}; // Cache stores combined data per period key ('9/2025')
-        // FIX: Default the calendar date to a configured month (September 2025)
-        let currentCalendarDate = new Date(2025, 8, 1); // Tracks the currently displayed month/year for the calendar
+        let currentCalendarDate = new Date(2025, 8, 1); // Tracks the currently displayed month/year for the calendar (starts Sept 1, 2025)
 
         /**
          * Looks up the configuration object for a specific date within the ATTENDANCE_CONFIG.
@@ -852,13 +912,17 @@ Use of these materials by clients and stakeholders is permitted solely for inter
 
         /**
          * Calculates and displays the total deployment for the entire month (TL and Sellers).
-         * This fetches and combines data from all configured sheets for the current month ('9/2025').
+         * This fetches and combines data from all configured sheets for the current month.
          */
         async function showMonthlyDeploymentTotals() {
             const outputElement = document.getElementById('mandays-report-output');
             outputElement.innerHTML = '<div class="text-center p-3 text-secondary"><i class="fas fa-spinner fa-spin gold-accent me-2"></i> Calculating total monthly deployment...</div>';
             
-            const monthYearKey = '9/2025'; // Currently hardcoded to the provided data period
+            // FIX: Use currentCalendarDate to derive the monthYearKey dynamically
+            const month = currentCalendarDate.getMonth() + 1;
+            const year = currentCalendarDate.getFullYear();
+            const monthYearKey = `${month}/${year}`; 
+            const monthName = currentCalendarDate.toLocaleString('default', { month: 'long', year: 'numeric' });
 
             try {
                 const combinedMatrix = await fetchAttendanceDataForPeriod(monthYearKey);
@@ -892,16 +956,13 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                     }
                 });
 
-                const totalManpowerDays = totalTLAttendance + totalSellerAttendance;
-                const tlTarget = 23; // Placeholder for TL Target (23 working days)
-                const sellerTarget = 176; // Placeholder for Seller Target (22 days * 8 sellers)
+                // NOTE: Targets are hardcoded based on previous user input (Sept 2025 structure)
+                const tlTarget = 23; 
+                const sellerTarget = 176; 
 
                 outputElement.innerHTML = `
                     <div class="p-4">
-                        <h4 class="gold-accent mb-3">Total Deployment (Combined Sept 1-30, 2025)</h4>
-                        <div class="d-flex justify-content-around text-center fw-bold mb-4">
-                            <span class="text-success fs-5">TOTAL MANDAYS: ${totalManpowerDays}</span>
-                        </div>
+                        <h4 class="gold-accent mb-3">Total Deployment (Combined ${monthName})</h4>
                         <hr class="border-secondary">
                         <div class="row text-center">
                             <div class="col-md-6 mb-3">
@@ -919,7 +980,7 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                 `;
 
             } catch (error) {
-                outputElement.innerHTML = `<div class="alert alert-danger">❌ Failed to calculate monthly totals. Error: ${error.message}</div>`;
+                outputElement.innerHTML = `<div class="alert alert-danger">❌ Failed to calculate monthly totals for ${monthYearKey}. Error: ${error.message}</div>`;
                 console.error("Error calculating monthly deployment totals:", error);
             }
         }
@@ -927,17 +988,22 @@ Use of these materials by clients and stakeholders is permitted solely for inter
         /**
          * Calculates and displays the total attendance days per unique seller for the entire month,
          * with a breakdown for P1 (1-15) and P2 (16-30) payroll periods.
-         * This fetches and combines data from all configured sheets for the current month ('9/2025').
+         * This fetches and combines data from all configured sheets for the current month.
          */
         async function showAttendancePerSellerReport() {
             const outputElement = document.getElementById('mandays-report-output');
             outputElement.innerHTML = '<div class="text-center p-3 text-secondary"><i class="fas fa-spinner fa-spin gold-accent me-2"></i> Calculating attendance per seller...</div>';
             
-            const monthYearKey = '9/2025'; // Currently hardcoded to the provided data period
+            // FIX: Use currentCalendarDate to derive the monthYearKey dynamically
+            const month = currentCalendarDate.getMonth() + 1;
+            const year = currentCalendarDate.getFullYear();
+            const monthYearKey = `${month}/${year}`;
 
             try {
                 const combinedMatrix = await fetchAttendanceDataForPeriod(monthYearKey);
                 const [headerRow, ...sellerRows] = combinedMatrix;
+                
+                const periodsConfig = ATTENDANCE_CONFIG[monthYearKey];
                 
                 let sellerTotalsMap = new Map();
                 const dateColumnsStart = 3;
@@ -961,12 +1027,15 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                             const dateParts = dateString.split('/');
                             const dayOfMonth = parseInt(dateParts[1], 10); // Assumes M/D/YYYY format 
                             
-                            if (dayOfMonth >= 1 && dayOfMonth <= 15) {
+                            // Check against defined periods in the config for this month
+                            if (periodsConfig.length >= 1 && dayOfMonth >= periodsConfig[0].startDay && dayOfMonth <= periodsConfig[0].endDay) {
                                 totalPresentDaysP1++;
-                            } else if (dayOfMonth >= 16 && dayOfMonth <= 30) {
+                            } 
+                            // Only check for P2 if a second period is defined
+                            else if (periodsConfig.length >= 2 && dayOfMonth >= periodsConfig[1].startDay && dayOfMonth <= periodsConfig[1].endDay) {
                                 totalPresentDaysP2++;
                             }
-                            // Note: Day 31 will be ignored based on the 16-30 rule, which aligns with Sept 30 end date.
+                            // NOTE: For months with only one period (like Oct 1-15 provided), P2 will remain 0.
                         }
                     }
                     
@@ -987,7 +1056,10 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                     return;
                 }
 
-                let listHtml = '<h4 class="gold-accent mb-3">Seller Attendance Totals (Mandays Breakdown)</h4><ul class="list-group">';
+                const period1Label = periodsConfig[0]?.sheetName.split('!')[0] || 'Period 1';
+                const period2Label = periodsConfig[1]?.sheetName.split('!')[0] || 'Period 2 (N/A)';
+
+                let listHtml = `<h4 class="gold-accent mb-3">Seller Attendance Totals (Mandays Breakdown for ${monthYearKey})</h4><ul class="list-group">`;
                 
                 sortedSellers.forEach(seller => {
                     listHtml += `
@@ -995,8 +1067,8 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                             <div>
                                 <span class="fw-bold text-white">${seller.name}</span>
                                 <div class="payroll-breakdown mt-1">
-                                    <span class="payroll-p1">P1 (1-15): ${seller.p1} days</span>
-                                    <span class="payroll-p2">P2 (16-30): ${seller.p2} days</span>
+                                    <span class="payroll-p1">${period1Label}: ${seller.p1} days</span>
+                                    <span class="payroll-p2">${period2Label}: ${seller.p2} days</span>
                                 </div>
                             </div>
                             <span class="badge bg-success rounded-pill p-2 fs-6">${seller.total} TOTAL</span>
@@ -1009,7 +1081,7 @@ Use of these materials by clients and stakeholders is permitted solely for inter
 
 
             } catch (error) {
-                outputElement.innerHTML = `<div class="alert alert-danger">❌ Failed to calculate seller attendance. Error: ${error.message}</div>`;
+                outputElement.innerHTML = `<div class="alert alert-danger">❌ Failed to calculate seller attendance for ${monthYearKey}. Error: ${error.message}</div>`;
                 console.error("Error calculating seller attendance:", error);
             }
         }
