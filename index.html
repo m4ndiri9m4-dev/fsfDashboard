@@ -119,6 +119,15 @@
             margin-right: 8px;
             object-fit: contain;
         }
+        /* NEW: Style for the large section header image */
+        .section-header-img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+            display: inline-block;
+            margin-right: 10px;
+            vertical-align: middle;
+        }
 
 
         .chart-container {
@@ -260,7 +269,7 @@
         <div class="container">
             <!-- Navbar Brand: Replaced text with image -->
             <a class="navbar-brand" href="#" onclick="switchView('home')">
-                <img src="elle_logo.png" alt="ELLE, CCMGI-ERP Logo" class="navbar-logo">
+                <img src="home.png" alt="ELLE,CCMGI-ERP Logo" class="navbar-logo">
             </a>
             <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -338,12 +347,12 @@
                 <h1 class="text-center fw-bold mb-5 gold-accent">Project FSF Monitoring Hub</h1>
                 
                 <!-- START SECTION: MANDAYS AND ATTENDANCE MONITORING (New Wrapper) -->
-                <h3 class="text-center fw-bold mb-4 gold-accent" style="color:#EC4899 !important;">Mandays & Attendance Monitoring</h3>
+                <!-- REMOVED text header: <h3 class="text-center fw-bold mb-4 gold-accent" style="color:#EC4899 !important;">Mandays & Attendance Monitoring</h3> -->
                 <div id="mandays-monitoring-wrapper" class="futuristic-card mb-5">
                     <div class="d-flex justify-content-between align-items-center mb-3">
                         <h2 class="mb-0">
                             <!-- Mandays Icon (Updated to Image) -->
-                            <img src="mandays.jpg" alt="Mandays Icon" class="report-icon-img gold-accent me-2"> Mandays Monitoring
+                            <img src="mandays.png" alt="Mandays Monitoring" class="section-header-img gold-accent me-2"> Mandays Monitoring
                         </h2>
                         <!-- Collapse Toggle Button for Sub-options -->
                         <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#mandays-sub-menu" aria-expanded="false" aria-controls="mandays-sub-menu">
@@ -395,7 +404,7 @@
                 <div id="postpaid-total-processed-summary" class="custom-report futuristic-card mb-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <!-- Postpaid Icon (Updated to Image) -->
-                        <h2><img src="postpaid.jpg" alt="Postpaid Icon" class="report-icon-img"> Total Applications Processed</h2>
+                        <h2><img src="postpaid.png" alt="Postpaid Icon" class="report-icon-img"> Total Applications Processed</h2>
                         <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#postpaid-total-processed-content" aria-expanded="false" aria-controls="postpaid-total-processed-content">
                             VIEW DATA
                         </button>
