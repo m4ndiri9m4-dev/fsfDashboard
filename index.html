@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome Icons (Replaces missing img/*) -->
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <!-- Chart.js Library for Visualization -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
@@ -115,7 +115,68 @@
             padding: 15px;
         }
         
-        /* Calendar Styles */
+        /* Modal Styles */
+        .modal-content {
+            background: linear-gradient(135deg, #1f1d47, #3d0a25);
+            border: 2px solid #EC4899;
+            color: white;
+            font-family: 'Orbitron', sans-serif;
+        }
+        .modal-header {
+            border-bottom: 1px solid #FFD700;
+        }
+        .modal-title {
+            color: #FFD700;
+            font-weight: 700;
+        }
+        .modal-body {
+            max-height: 70vh;
+            overflow-y: auto;
+        }
+        /* Existing Status Styles */
+        .status-P { background-color: #38a169; }
+        .status-A { background-color: #c53030; }
+        .status-L { background-color: #4c51bf; }
+        .status-D { background-color: #dd6b20; }
+
+        /* Daily Attendance List Styling */
+        .daily-status-list {
+            list-style: none;
+            padding: 0;
+        }
+        .daily-status-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px 15px;
+            margin-bottom: 5px;
+            border-radius: 5px;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-left: 5px solid;
+        }
+        .status-P-border { border-left-color: #38a169; }
+        .status-A-border { border-left-color: #c53030; }
+        .status-L-border { border-left-color: #4c51bf; }
+        .status-D-border { border-left-color: #dd6b20; }
+        .status-O-border { border-left-color: #FFD700; } /* Other/Unknown */
+        
+        /* New P1/P2 Breakdown Style */
+        .payroll-breakdown {
+            display: flex;
+            flex-direction: column;
+            text-align: right;
+            font-size: 0.85rem;
+        }
+        .payroll-p1 {
+            color: #FFD700; /* Gold */
+            font-weight: 700;
+        }
+        .payroll-p2 {
+            color: #C0C0C0; /* Silver/Light Grey */
+            font-weight: 500;
+        }
+        
+        /* Calendar Specific Styles */
         .calendar-nav {
             display: flex;
             justify-content: space-between;
@@ -144,7 +205,7 @@
         .day-cell {
             padding: 10px 5px;
             cursor: pointer;
-            transition: background-color 0.2s;
+            transition: background-color 0.2s, color 0.2s;
             border-radius: 0.5rem;
             font-size: 1.1rem;
             font-weight: 500;
@@ -168,55 +229,6 @@
             padding: 0 10px;
         }
 
-        /* Modal Styles */
-        .modal-content {
-            background: linear-gradient(135deg, #1f1d47, #3d0a25);
-            border: 2px solid #EC4899;
-            color: white;
-            font-family: 'Orbitron', sans-serif;
-        }
-        .modal-header {
-            border-bottom: 1px solid #FFD700;
-        }
-        .modal-title {
-            color: #FFD700;
-            font-weight: 700;
-        }
-        .modal-body {
-            max-height: 70vh;
-            overflow-y: auto;
-        }
-        .attendance-cell {
-            min-width: 50px;
-            text-align: center;
-            font-size: 0.85rem;
-            padding: 5px;
-        }
-        .status-P { background-color: #38a169; } /* Green */
-        .status-A { background-color: #c53030; } /* Red */
-        .status-L { background-color: #4c51bf; } /* Blue/Late */
-        .status-D { background-color: #dd6b20; } /* Orange/Day Off */
-
-        /* Daily List Styles */
-        .present-seller-list {
-            list-style: none;
-            padding: 0;
-        }
-        .present-seller-list li {
-            padding: 5px 0;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-        /* New style for Attendance List */
-        .attendance-summary-list .list-group-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: rgba(255, 255, 255, 0.05);
-            border: none;
-            margin-bottom: 5px;
-            border-radius: 0.5rem;
-            padding: 10px 15px;
-        }
     </style>
 </head>
 <body>
@@ -224,54 +236,31 @@
     <!-- Start Navigation -->
     <nav class="navbar fixed-top navbar-expand-lg navbar-dark fixed-top">
         <div class="container">
-            <a class="navbar-brand gold-accent" href="#">FSF Dashboard by Elle</a>
+            <!-- Clicking the title returns to Home -->
+            <a class="navbar-brand gold-accent" href="#" onclick="switchView('home')">FSF Dashboard by Elle</a>
             <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
             </button>
 
             <!-- Start Links -->
             <div class="collapse navbar-collapse" id="navbarResponsive">
-                <ul class="navbar-nav ms-auto" id="main-nav-links">
+                <ul class="navbar-nav ms-auto">
                     <!-- Home -->
                     <li class="nav-item">
                         <a class="nav-link" href="#" onclick="switchView('home')">
                             <i class="fas fa-home gold-accent"></i> Home
                         </a>
                     </li>
-                    
-                    <!-- DYNAMIC DASHBOARD NAVIGATION (Initially hidden, revealed on Project click) -->
-                    <li class="nav-item dashboard-nav-item" style="display: none;">
-                        <a class="nav-link" href="#" onclick="switchView('mandays')">
-                            <i class="fas fa-calendar-alt gold-accent"></i> Manpower Monitoring
-                        </a>
-                    </li>
-                    <li class="nav-item dashboard-nav-item" style="display: none;">
-                        <a class="nav-link" href="#" onclick="switchView('postpaid')">
-                            <i class="fas fa-wifi gold-accent"></i> Postpaid
-                        </a>
-                    </li>
-                    <li class="nav-item dashboard-nav-item" style="display: none;">
-                        <a class="nav-link" href="#" onclick="switchView('wowfipro')">
-                            <i class="fas fa-box-open gold-accent"></i> WowFi Pro
-                        </a>
-                    </li>
-                    <li class="nav-item dashboard-nav-item" style="display: none;">
-                        <a class="nav-link" href="#" onclick="switchView('simsold')">
-                            <i class="fas fa-sim-card gold-accent"></i> SIM Sold
-                        </a>
-                    </li>
-                    <!-- END DYNAMIC DASHBOARD NAVIGATION -->
-
-                    <!-- NEW: About Link -->
+                    <!-- About -->
                     <li class="nav-item">
                         <a class="nav-link" href="#" onclick="switchView('about')">
                             <i class="fas fa-info-circle gold-accent"></i> About
                         </a>
                     </li>
-                    <!-- NEW: Contact Link (Opens GMail Composer) -->
+                    <!-- Contact -->
                     <li class="nav-item">
-                        <a class="nav-link" href="mailto:ella@ccmgi.com.ph?subject=Suggestions/Concerns%20about%20FSF%20Dashboard" target="_blank">
-                            <i class="fas fa-envelope gold-accent"></i> Contact
+                        <a class="nav-link" href="#" onclick="switchView('contact')">
+                            <i class="fas fa-headset gold-accent"></i> Contact
                         </a>
                     </li>
                 </ul>
@@ -285,78 +274,33 @@
         <div id="content-area">
 
             <!-- ============================================== -->
-            <!-- 0. HOME INTERFACE (Default View)               -->
+            <!-- 0. HOME INTERFACE (Dashboard Menu)             -->
             <!-- ============================================== -->
             <div id="home-view" class="view-section">
-                <h1 class="text-center fw-bold mb-5 gold-accent">Dashboard Menu</h1>
-                
-                <!-- NEW: Projects Section -->
-                <div id="project-grid-view" class="futuristic-card mb-5">
-                    <h2 class="text-white fw-bold mb-4">Select a Project Area</h2>
-                    <div class="row g-4">
-                        
-                        <!-- Project FSF Area: Eastern Visayas (This button will now contain the dashboard links) -->
-                        <div class="col-12 col-lg-4">
-                            <div class="grid-button" onclick="switchProjectView('FSF-EV')">
-                                <i class="fas fa-map-marked-alt gold-accent"></i>
-                                <span>FSF - Eastern Visayas</span>
-                                <p class="text-white-50 mt-1 mb-0" style="font-size: 0.8rem;">Project FSF</p>
-                                <!-- Sub-navigation structure is now moved to the main navbar -->
-                            </div>
-                        </div>
-
-                        <!-- Project Command: Northern Luzon -->
-                        <div class="col-12 col-lg-4">
-                            <div class="grid-button" onclick="switchProjectView('COMMAND-NL')">
-                                <i class="fas fa-satellite-dish gold-accent"></i>
-                                <span>COMMAND - Northern Luzon</span>
-                                <p class="text-white-50 mt-1 mb-0" style="font-size: 0.8rem;">Project Command</p>
-                            </div>
-                        </div>
-
-                        <!-- Project Opella: MDC (Nationwide) -->
-                        <div class="col-12 col-lg-4">
-                            <div class="grid-button" onclick="switchProjectView('OPELLA-MD')">
-                                <i class="fas fa-globe-americas gold-accent"></i>
-                                <span>OPELLA - MDC (Nationwide)</span>
-                                <p class="text-white-50 mt-1 mb-0" style="font-size: 0.8rem;">Project Opella</p>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Original dashboard buttons hidden -->
-                <div class="row g-4" style="display: none;">
+                <h1 class="text-center fw-bold mb-5 gold-accent">Project Dashboard Menu</h1>
+                <div class="row g-4">
                     
-                    <!-- Mandays Button -->
-                    <div class="col-6 col-lg-3">
-                        <div class="grid-button" onclick="switchView('mandays')">
-                            <i class="fas fa-calendar-alt gold-accent"></i>
-                            <span>Mandays</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Postpaid Button -->
-                    <div class="col-6 col-lg-3">
-                        <div class="grid-button" onclick="switchView('postpaid')">
-                            <i class="fas fa-wifi gold-accent"></i>
-                            <span>Postpaid</span>
+                    <!-- Project FSF Button -->
+                    <div class="col-12 col-lg-4">
+                        <div class="grid-button" onclick="switchView('project-fsf')">
+                            <i class="fas fa-chart-line gold-accent"></i>
+                            <span>Project FSF - Eastern Visayas</span>
                         </div>
                     </div>
 
-                    <!-- WowFi Pro Prepaid Button -->
-                    <div class="col-6 col-lg-3">
-                        <div class="grid-button" onclick="switchView('wowfipro')">
-                            <i class="fas fa-box-open gold-accent"></i>
-                            <span>WowFi Pro Prepaid</span>
+                    <!-- Project Command Button -->
+                    <div class="col-12 col-lg-4">
+                        <div class="grid-button" onclick="switchView('project-command')">
+                            <i class="fas fa-shield-alt gold-accent"></i>
+                            <span>Project Command - Northern Luzon</span>
                         </div>
                     </div>
 
-                    <!-- SIM Sold Button -->
-                    <div class="col-6 col-lg-3">
-                        <div class="grid-button" onclick="switchView('simsold')">
-                            <i class="fas fa-sim-card gold-accent"></i>
-                            <span>SIM Sold</span>
+                    <!-- Project Opella Button -->
+                    <div class="col-12 col-lg-4">
+                        <div class="grid-button" onclick="switchView('project-opella')">
+                            <i class="fas fa-globe-asia gold-accent"></i>
+                            <span>Project Opella - Nationwide</span>
                         </div>
                     </div>
 
@@ -364,45 +308,60 @@
             </div>
             
             <!-- ============================================== -->
-            <!-- 1. MANDAYS SECTION (NOW ATTENDANCE CALENDAR)   -->
+            <!-- 1. PROJECT FSF MASTER SECTION (New Hub)        -->
             <!-- ============================================== -->
-            <div id="mandays-view" class="view-section" style="display:none;">
-                <h1 class="text-center fw-bold mb-5 gold-accent">Attendance Monitoring Calendar</h1>
-
-                <!-- Combined Attendance Calendar View -->
-                <div id="attendance-calendar-main" class="custom-report futuristic-card mb-4">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h2>📅 Click a Date to View Attendance History</h2>
-                        <!-- New button for Total Sellers Deployed -->
-                        <button class="btn btn-sm btn-warning" onclick="fetchTotalSellersDeployed()">
-                            <i class="fas fa-users me-1"></i> Total Manpower Days
+            <div id="project-fsf-view" class="view-section" style="display:none;">
+                <h1 class="text-center fw-bold mb-5 gold-accent">Project FSF Monitoring Hub</h1>
+                
+                <!-- START SECTION: MANDAYS AND ATTENDANCE MONITORING (New Wrapper) -->
+                <h3 class="text-center fw-bold mb-4 gold-accent" style="color:#EC4899 !important;">Mandays & Attendance Monitoring</h3>
+                <div id="mandays-monitoring-wrapper" class="futuristic-card mb-5">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <h2 class="mb-0"><i class="fas fa-calendar-alt gold-accent me-2"></i> Mandays Monitoring</h2>
+                        <!-- Collapse Toggle Button for Sub-options -->
+                        <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#mandays-sub-menu" aria-expanded="false" aria-controls="mandays-sub-menu">
+                            VIEW OPTIONS
                         </button>
                     </div>
-                    <div id="seller-content" class="collapse mt-3 show">
-                        <div class="text-center p-3 text-secondary">Loading Calendar...</div>
-                    </div>
-                </div>
 
-                <!-- NEW: Attendance Per Seller List (Replaces Chart) -->
-                <div id="attendance-seller-chart-summary" class="custom-report futuristic-card mb-4">
-                    <h2>📋 Total Attendance Per Seller</h2>
-                    <button class="btn btn-sm btn-warning" data-bs-toggle="collapse" data-bs-target="#attendance-seller-chart-content" aria-expanded="false" aria-controls="attendance-seller-chart-content">
-                        VIEW LIST DATA
-                    </button>
-                    <div id="attendance-seller-chart-content" class="collapse mt-3">
-                        <!-- List will be rendered here by renderAttendanceListPerSeller -->
-                        <div class="text-center p-3 text-secondary">Click 'View List Data' to load totals...</div>
+                    <!-- Mandays Sub-menu Container -->
+                    <div id="mandays-sub-menu" class="collapse">
+                        <div class="row g-2 p-3 border border-secondary rounded-lg">
+                            
+                            <!-- Button: Attendance Per Seller (Total List) -->
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100 fw-bold" onclick="showMandaysReport('attendance_per_seller')">
+                                    <i class="fas fa-user-check me-1"></i> Attendance Per Seller (Total List)
+                                </button>
+                            </div>
+                            
+                            <!-- Button: Daily Attendance Calendar (REPLACED DAILY DEPLOYMENT) -->
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100 fw-bold" onclick="showMandaysReport('daily_calendar')">
+                                    <i class="fas fa-calendar-day me-1"></i> Daily Attendance Calendar
+                                </button>
+                            </div>
+                            
+                            <!-- Button: Total Deployment per Month (TL, Sellers) (Monthly Table) -->
+                            <div class="col-12">
+                                <button class="btn btn-primary w-100 fw-bold" onclick="showMandaysReport('monthly_deployment')">
+                                    <i class="fas fa-chart-bar me-1"></i> Total Deployment per Month (TL, Sellers)
+                                </button>
+                            </div>
+                            
+                            <!-- Container for report output -->
+                            <div id="mandays-report-output" class="col-12 mt-3">
+                                <div class="text-center p-3 text-white-50">Select a report option above.</div>
+                            </div>
+
+                        </div>
                     </div>
                 </div>
-            </div>
-            
-            <!-- ============================================== -->
-            <!-- 2. POSTPAID SECTION                            -->
-            <!-- ============================================== -->
-            <div id="postpaid-view" class="view-section" style="display:none;">
-                 <h1 class="text-center fw-bold mb-5 gold-accent">Postpaid Monitoring</h1>
-                 
-                <!-- NEW: Total Applications Processed -->
+                <!-- END SECTION: MANDAYS AND ATTENDANCE MONITORING -->
+
+                <h3 class="text-center fw-bold mb-4 gold-accent" style="color:#EC4899 !important;">Postpaid Reporting</h3>
+                
+                <!-- POSTPAID BLOCKS -->
                 <div id="postpaid-total-processed-summary" class="custom-report futuristic-card mb-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <h2>Total Applications Processed</h2>
@@ -415,8 +374,6 @@
                     </div>
                 </div>
 
-
-                <!-- NEW: Total Applications Approved -->
                 <div id="postpaid-total-approved-summary" class="custom-report futuristic-card mb-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <h2>Total Applications Approved</h2>
@@ -429,8 +386,6 @@
                     </div>
                 </div>
 
-
-                <!-- NEW: Total Applications Installed -->
                 <div id="postpaid-total-installed-summary" class="custom-report futuristic-card mb-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <h2>Total Applications Installed</h2>
@@ -443,8 +398,6 @@
                     </div>
                 </div>
 
-                
-                <!-- NEW: Total Pending Installation -->
                 <div id="postpaid-pending-install-summary" class="custom-report futuristic-card mb-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <h2>Total Pending Installation</h2>
@@ -457,8 +410,6 @@
                     </div>
                 </div>
 
-
-                <!-- NEW: Total Pending Approval -->
                 <div id="postpaid-pending-approval-summary" class="custom-report futuristic-card mb-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <h2>Total Pending Approval</h2>
@@ -470,17 +421,10 @@
                         <div class="text-center p-3 text-secondary">Loading Pending Approval Data...</div>
                     </div>
                 </div>
-
-
-            </div>
-            
-            <!-- ============================================== -->
-            <!-- 3. WOWFI PRO PREPAID SECTION                   -->
-            <!-- ============================================== -->
-            <div id="wowfipro-view" class="view-section" style="display:none;">
-                <h1 class="text-center fw-bold mb-5 gold-accent">WowFi Pro Prepaid Monitoring</h1>
                 
-                <!-- NEW: Total WowFi Pro Sold -->
+                <h3 class="text-center fw-bold mb-4 mt-5 gold-accent" style="color:#EC4899 !important;">WowFi Pro Reporting</h3>
+
+                <!-- WOWFI PRO BLOCKS -->
                 <div id="wowfi-sold-summary" class="custom-report futuristic-card mb-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <h2>Total WowFi Pro Sold</h2>
@@ -489,21 +433,13 @@
                         </button>
                     </div>
                     <div id="wowfi-sold-content" class="collapse mt-3">
-                        <!-- Content will be loaded here -->
                         <div class="text-center p-3 text-secondary">Click 'View Data' to load total sold count...</div>
                     </div>
                 </div>
-                <!-- Removed other WowFi Pro elements (Activated, Daily Chart, Seller Chart) -->
-
-            </div>
-            
-            <!-- ============================================== -->
-            <!-- 4. SIM SOLD SECTION                            -->
-            <!-- ============================================== -->
-            <div id="simsold-view" class="view-section" style="display:none;">
-                <h1 class="text-center fw-bold mb-5 gold-accent">SIM Sold Monitoring</h1>
                 
-                <!-- FIX: Renamed and simplified block -->
+                <h3 class="text-center fw-bold mb-4 mt-5 gold-accent" style="color:#EC4899 !important;">SIM Sold Reporting</h3>
+
+                <!-- SIM SOLD BLOCKS -->
                 <div id="simsold-sold-summary" class="custom-report futuristic-card mb-4">
                     <div class="d-flex justify-content-between align-items-center">
                         <h2>Total SIM Sold</h2>
@@ -515,75 +451,64 @@
                         <div class="text-center p-3 text-secondary">Loading Sold Count Data...</div>
                     </div>
                 </div>
-                <!-- REMOVED: No. of Activated, Visual Chart Sold per Day, Visual Chart Total Sold per Seller, Visual Chart Activated per Seller -->
-
+            </div>
+            
+            <!-- ============================================== -->
+            <!-- 2. PROJECT COMMAND SECTION (Placeholder)       -->
+            <!-- ============================================== -->
+            <div id="project-command-view" class="view-section" style="display:none;">
+                <h1 class="text-center fw-bold mb-5 gold-accent">Project Command - Northern Luzon</h1>
+                <div class="futuristic-card text-center p-5">
+                    <p class="fs-4 text-warning">System Offline</p>
+                    <p class="text-white-50">This dashboard section is awaiting data integration for Northern Luzon reports.</p>
+                </div>
             </div>
 
             <!-- ============================================== -->
-            <!-- 5. ABOUT/CONTACT SECTION                       -->
+            <!-- 3. PROJECT OPELLA SECTION (Placeholder)        -->
+            <!-- ============================================== -->
+            <div id="project-opella-view" class="view-section" style="display:none;">
+                <h1 class="text-center fw-bold mb-5 gold-accent">Project Opella - Nationwide</h1>
+                <div class="futuristic-card text-center p-5">
+                    <p class="fs-4 text-warning">System Offline</p>
+                    <p class="text-white-50">This dashboard section is awaiting data integration for Nationwide reports.</p>
+                </div>
+            </div>
+
+            <!-- ============================================== -->
+            <!-- 4. ABOUT SECTION (Placeholder)                 -->
             <!-- ============================================== -->
             <div id="about-view" class="view-section" style="display:none;">
-                <h1 class="text-center fw-bold mb-5 gold-accent">About & Developer Contact</h1>
-                <div class="futuristic-card mb-4">
-                    <h2 class="text-white mb-4">Application Description</h2>
-                    <p class="text-white-50" style="text-align: justify; font-size: 0.95rem;">
-                        This **FSF Dashboard** serves as a centralized, real-time visualization platform designed to streamline monitoring of field sales force operations, covering key metrics like deployment rates, manpower attendance, and product sales performance against daily targets. It provides mission-critical data access for timely strategic decisions by the CCMGI Project Coordinator.
-                    </p>
-                </div>
-                
-                <div class="futuristic-card mb-4">
-                    <h2 class="text-white mb-4">Developer Credits & Information</h2>
-                    <div class="d-flex justify-content-between align-items-start mb-3 border-bottom border-secondary pb-3">
-                        <div>
-                            <p class="fw-bold gold-accent mb-0">Developer</p>
-                            <!-- UPDATED DEVELOPER NAME -->
-                            <p class="text-white">Harold Loteyro (ᜑᜇᜓᜎ᜔)</p> 
-                        </div>
-                        <div class="text-end">
-                            <p class="fw-bold gold-accent mb-0">Technologies Used</p>
-                            <p class="text-white">HTML5, CSS3, JavaScript, Bootstrap 5, Google Sheets API</p>
-                        </div>
-                    </div>
-
-                    <div class="mb-4">
-                        <p class="fw-bold gold-accent mb-1">Business Inquiries & Collaboration</p>
-                        <p class="text-white-50">I am available for freelance projects to develop similar real-time dashboards and data visualization tools for your business needs.</p>
-                        <p class="text-white mb-1">
-                            <i class="fas fa-envelope gold-accent me-2"></i> **Email:** <a href="mailto:m4ndiri9m4.dev@gmail.com?subject=Business%20Inquiry%20from%20FSF%20Dashboard" class="text-warning">m4ndiri9m4.dev@gmail.com</a>
-                        </p>
-                        <p class="text-white mb-1">
-                            <i class="fas fa-phone gold-accent me-2"></i> **Cell/Viber:** 09910120963 / 09939580509
-                        </p>
-                        <p class="text-white">
-                            <i class="fas fa-user-tag gold-accent me-2"></i> **Credit Description:** develop by: m4ndiri9m4
-                        </p>
-                    </div>
-
-                    <div class="mt-4">
-                        <p class="fw-bold gold-accent mb-1">Suggestions & Concerns (Contact Site Owner)</p>
-                        <p class="text-white-50">If you have suggestions, concerns, or bug reports regarding the functionality or data of this specific FSF Dashboard, please contact the site owner via email.</p>
-                        <a href="mailto:ella@ccmgi.com.ph?subject=FSF%20Dashboard%20Feedback%20for%20Gracelle" class="btn btn-warning mt-2">
-                            <i class="fas fa-comments me-2"></i> Send Message to Owner
-                        </a>
-                    </div>
+                <h1 class="text-center fw-bold mb-5 gold-accent">About the Dashboard</h1>
+                <div class="futuristic-card p-4">
+                    <p>This is a live data monitoring tool built for the FSF Project, designed to provide real-time performance insights through direct connection to Google Sheets.</p>
                 </div>
             </div>
 
+            <!-- ============================================== -->
+            <!-- 5. CONTACT SECTION (Placeholder)               -->
+            <!-- ============================================== -->
+            <div id="contact-view" class="view-section" style="display:none;">
+                <h1 class="text-center fw-bold mb-5 gold-accent">Contact Support</h1>
+                <div class="futuristic-card p-4">
+                    <p>For support regarding data configuration or dashboard features, please contact the Project Coordinator.</p>
+                </div>
+            </div>
         </div>
     </div>
     <!-- End Main Container -->
 
-    <!-- Attendance Details Modal -->
+    <!-- Modal (Used for Daily Attendance) -->
     <div class="modal fade" id="attendanceModal" tabindex="-1" aria-labelledby="attendanceModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h5 class="modal-title" id="attendanceModalLabel">Attendance for [Date]</h5>
+                    <h5 class="modal-title" id="attendanceModalLabel">Daily Attendance Status</h5>
                     <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
-                    <!-- Dynamic attendance list will be inserted here -->
-                    <div id="attendanceDetailsBody">Loading details...</div>
+                    <!-- Dynamic daily attendance list will be inserted here -->
+                    <div id="attendanceDetailsBody">Loading attendance details...</div>
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-warning" data-bs-dismiss="modal">Close</button>
@@ -595,14 +520,6 @@
 
     <footer class="py-3 mt-auto bg-dark">
         <div class="container">
-            <!-- App Description -->
-            <p class="m-0 text-center text-white-50" style="color: #FFBF00 !important; font-size: 0.8rem;">
-                <!-- Used Bootstrap text-center for block-level centering of content -->
-                <span style="display: block; text-align: justify; margin: 0 auto; max-width: 90%;">
-                    **Application Description:** This FSF Dashboard serves as a centralized, real-time visualization platform designed to streamline monitoring of field sales force operations, covering key metrics like deployment rates, manpower attendance, and product sales performance against daily targets. It provides mission-critical data access for timely strategic decisions by the CCMGI Project Coordinator.
-                </span>
-            </p>
-
             <!-- Main IP Statement Paragraph -->
             <p class="m-0 text-center text-white-50" style="color: #FFBF00 !important; font-size: 0.8rem;">
                 <!-- Used Bootstrap text-center for block-level centering of content -->
@@ -612,15 +529,9 @@ Unauthorized reproduction, distribution, modification, or commercial use of any 
 Use of these materials by clients and stakeholders is permitted solely for internal review and decision-making purposes. Any external sharing or publication must be explicitly approved.
                 </span>
             </p>
-            
             <!-- Separate Copyright Line, now in silver and bold -->
             <p class="m-0 text-center fw-bold" style="color: #C0C0C0 !important;">
                 © 2025 Gracelle Anne Magnaye, CCMGI. All rights reserved.
-            </p>
-
-            <!-- Developer Credit (Updated with right alignment and font size) -->
-            <p class="m-0 text-end" style="color: #FFD700 !important; font-size: 0.8em;">
-                <span style="font-size: 0.7em; font-weight: bold;">Developed by: </span>M4NDIRI9M4
             </p>
         </div>
     </footer>
@@ -630,120 +541,593 @@ Use of these materials by clients and stakeholders is permitted solely for inter
 
     <script>
         // Global map to hold Chart instances for dynamic destruction and recreation
-        let chartInstances = {}; 
-        let attendanceDataCache = null; // Cache for the seller attendance matrix
-        let currentCalendarDate = new Date(); // Tracks the currently displayed month/year
+        let chartInstances = {};
         
-        // NEW: Variable to hold the current selected project for data filtering
-        let currentProject = 'FSF-EV'; // Default project
-
-        // !! SECURITY WARNING !!
-        // Exposing your API Key in the frontend is highly insecure.
-        // For a live application, it is best practice to use a Google Apps Script Web App
-        // as a secure proxy to fetch data and protect your key.
-        const API_KEY = 'AIzaSyCoastovR_u1wB8gxkAOn5Esy6OU22ozVY'; 
-        const SPREADSHEET_ID = '10rPB-U5hdtdAkyfZlcmr82Fg_SnV1P8g5nwQ_D-0ABI'; // Your main Spreadsheet ID
-        // UPDATED BASE_URL for the Google Visualization Query Language endpoint
+        // --- Configuration ---
+        // 1. INPUT YOUR GOOGLE API KEY HERE (If not done already)
+        const API_KEY = 'AIzaSyCoastovR_u1wB8gxkAOn5Esy6OU22ozVY';
+        // 2. YOUR SPREADSHEET ID (Provided by user)
+        const SPREADSHEET_ID = '10rPB-U5hdtdAkyfZlcmr82Fg_SnV1P8g5nwQ_D-0ABI';
         const QUERY_URL = 'https://docs.google.com/spreadsheets/d/';
-
-        // =========================================================================
-        // NEW: Project-specific logic for switching the entire dashboard view.
-        // This function sets the project context and navigates to the Mandays view.
-        // =========================================================================
-        function switchProjectView(projectCode) {
-            currentProject = projectCode;
-            // Optionally, you might change the SPREADSHEET_ID here based on projectCode
-            console.log(`Switched to Project: ${currentProject}`);
-            
-            // This is the core modification: show the sub-navigation links when FSF-EV is clicked.
-            if (projectCode === 'FSF-EV') {
-                // Clicking FSF-EV now switches directly to the Manpower Monitoring view.
-                switchView('mandays');
-            } else {
-                // For other projects, show a placeholder or future implementation view
-                switchView('mandays'); // Temporarily loading mandays for all
-            }
-            
-            // FIX: Show the dashboard navigation links when a project is selected
-            document.querySelectorAll('.dashboard-nav-item').forEach(item => {
-                item.style.display = 'block';
-            });
-        }
-
-
-        // =========================================================================
-        // NEW: MULTI-SHEET ATTENDANCE CONFIGURATION (EDIT THIS OBJECT)
-        // Map Month/Year (M/YYYY) to the correct Sheet Name and Range.
-        // Format: 'MonthNumber/Year': { sheet: 'SheetName', range: 'A1:Z100' }
-        // The sheet range MUST contain: [Seller First Name, Seller Last Name, Designation, Date 1, Date 2, ...]
-        // =========================================================================
+        
+        // 3. ATTENDANCE CONFIGURATION (Mandays sheet layout for payroll check)
+        // This object defines the sheets and ranges for a given month/year key.
         const ATTENDANCE_CONFIG = {
-            // FIX: Separated September into two distinct pay periods for multi-range fetching.
             '9/2025': [
-                { sheet: 'September 1 to 15, 2025', range: 'A6:R18', endDay: 15 }, 
-                { sheet: 'September 16 to 30, 2025', range: 'A6:R27', endDay: 30 } 
+                { sheetRange: 'September 1 to 15, 2025!A6:R18', startDay: 1, endDay: 15, sheetName: 'September 1 to 15, 2025' },
+                { sheetRange: 'September 16 to 30, 2025!A6:R27', startDay: 16, endDay: 30, sheetName: 'September 16 to 30, 2025' }
             ],
-            '10/2025': [
-                { sheet: 'October 1 to 15, 2025', range: 'C3:AI17', endDay: 15 },
-                { sheet: 'October 16 to 31, 2025', range: 'C3:AI17', endDay: 31 }
-            ]
-            // NOTE: In a real app, you'd nest this config by project:
-            /*
-            PROJECT_CONFIGS = {
-                'FSF-EV': {
-                    '9/2025': [ ... FSF periods ]
-                },
-                'COMMAND-NL': {
-                    '9/2025': [ ... COMMAND periods ]
-                }
-            }
-            */
+            // Add other months/periods as needed here
         };
 
+        let attendanceDataCache = {}; // Cache stores combined data per period key ('9/2025')
+        // FIX: Default the calendar date to a configured month (September 2025)
+        let currentCalendarDate = new Date(2025, 8, 1); // Tracks the currently displayed month/year for the calendar
+
         /**
-         * Looks up the correct sheet and range for the given date.
-         * This function now handles multi-range periods within a single month.
-         * @param {Date} date - The date to check.
-         * @returns {{range: string, sheet: string, periods: Array} | null} 
+         * Looks up the configuration object for a specific date within the ATTENDANCE_CONFIG.
+         * @param {string} dateString - The date (e.g., "9/1/2025").
+         * @returns {Object | null} The period config object if found, otherwise null.
          */
-        function getAttendanceRange(date) {
+        function getDatePeriodConfig(dateString) {
+            const date = new Date(dateString);
             const day = date.getDate();
             const month = date.getMonth() + 1;
             const year = date.getFullYear();
             const key = `${month}/${year}`;
             
-            // NOTE: For a multi-project setup, this would be: 
-            // const periods = PROJECT_CONFIGS[currentProject][key];
             const periods = ATTENDANCE_CONFIG[key];
+            if (!periods) return null;
             
-            if (periods) {
-                // Check for the special 'Total Manpower Days' call where day is 0 (handled by fetchTotalSellersDeployed)
-                if (day === 0) { 
-                    // Return the entire periods array for fetching all sheets in the month (for totals/charts)
-                    return { periods: periods, sheet: 'Combined Month', range: 'N/A' };
+            // Find the specific period (e.g., 1-15 or 16-30) that contains this day
+            return periods.find(p => day >= p.startDay && day <= p.endDay);
+        }
+
+        /**
+         * Helper to fetch and cache the data matrix from multiple sheets for a full month/period.
+         * Used for monthly/seller totals.
+         * @param {string} monthYearKey - The key (e.g., '9/2025') for the config object.
+         * @returns {Promise<Array<Array<string>>>} The combined raw matrix data values.
+         */
+        async function fetchAttendanceDataForPeriod(monthYearKey) {
+            if (attendanceDataCache[monthYearKey]) {
+                return attendanceDataCache[monthYearKey];
+            }
+
+            const periods = ATTENDANCE_CONFIG[monthYearKey];
+            if (!periods) {
+                throw new Error(`Configuration Error: No attendance periods defined for ${monthYearKey}.`);
+            }
+
+            let combinedData = {
+                headerRow: null,
+                sellerRows: []
+            };
+            
+            // To handle non-aligned dates across the two sheets, we merge row by row based on name.
+            let sellerMap = new Map();
+            let uniqueDates = [];
+
+            for (const period of periods) {
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(period.sheetRange)}?key=${API_KEY}`;
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`[${period.sheetName}] HTTP error: ${errorData.message || response.status}`);
                 }
 
-                // FIX: Added logic to handle dates falling exactly on the endDay correctly
-                const config = periods.find(p => day <= p.endDay);
+                const data = await response.json();
+                if (!data.values || data.values.length === 0) continue;
+
+                const [headerRow, ...dataRows] = data.values;
+                // Col 0, 1, 2 are Name, Name, Designation. Col 3+ are dates/statuses.
+                const dateHeaders = headerRow.slice(3);
                 
-                if (config) {
-                    // Returns the A1 notation with the sheet name correctly prefixed
-                    return { 
-                        range: `${config.sheet}!${config.range}`,
-                        sheet: config.sheet // Used internally, now hidden from title
-                    };
+                // Add new dates to the master list
+                if (uniqueDates.length === 0) {
+                     uniqueDates.push(...headerRow.slice(0, 3), ...dateHeaders);
+                } else {
+                    // Append new date headers if they don't exist (handle case where P1 and P2 have slightly different date columns)
+                    dateHeaders.forEach(date => {
+                        if (!uniqueDates.includes(date)) {
+                            uniqueDates.push(date);
+                        }
+                    });
                 }
+                
+                // Process sellers
+                dataRows.forEach(row => {
+                    // Assume name is in column A and B (index 0 and 1) and designation in C (index 2)
+                    const fullName = `${row[0] || ''} ${row[1] || ''}`.trim();
+                    const designation = (row[2] || '').trim().toUpperCase();
+
+                    if (!fullName) return;
+
+                    if (!sellerMap.has(fullName)) {
+                        // Initialize seller 
+                        sellerMap.set(fullName, { 
+                            name: fullName, 
+                            designation: designation, 
+                            attendance: {} 
+                        });
+                    }
+
+                    // Map attendance status for this period
+                    dateHeaders.forEach((date, index) => {
+                         const status = (row[index + 3] || '').trim();
+                         // Only store non-empty statuses, giving preference to data already stored (in case of overlap, but typically sheets are unique)
+                         if (status) {
+                             sellerMap.get(fullName).attendance[date] = status;
+                         }
+                    });
+                });
             }
-            return null;
+            
+            // Finalize the matrix structure
+            let combinedMatrix = [];
+            // Header: [FName, LName, Designation, Date1, Date2, ...]
+            combinedMatrix.push(uniqueDates); 
+            
+            sellerMap.forEach(seller => {
+                let row = [
+                    seller.name.split(' ')[0] || '', 
+                    seller.name.split(' ')[1] || '', 
+                    seller.designation
+                ];
+                
+                // Append status for each date column using the full list of unique dates
+                uniqueDates.slice(3).forEach(date => {
+                    // Use status or an empty string if status is not available for that date
+                    const status = seller.attendance[date] || ''; 
+                    row.push(status);
+                });
+                combinedMatrix.push(row);
+            });
+            
+            if (combinedMatrix.length <= 1) { // Only header row exists
+                throw new Error("No seller data found after combining periods.");
+            }
+
+            attendanceDataCache[monthYearKey] = combinedMatrix;
+            return combinedMatrix;
+        }
+
+
+        /**
+         * Fetches attendance data for the specified date and displays the result in a modal.
+         * @param {string} dateString - The date clicked (e.g., "9/1/2025").
+         */
+        async function fetchAndShowDailyAttendance(dateString) {
+            const modalBody = document.getElementById('attendanceDetailsBody');
+            const modalTitle = document.getElementById('attendanceModalLabel');
+            modalTitle.textContent = `Daily Status for ${dateString}`;
+            modalBody.innerHTML = '<div class="text-center p-3 text-secondary"><i class="fas fa-spinner fa-spin gold-accent me-2"></i> Fetching attendance details...</div>';
+            
+            const modal = new bootstrap.Modal(document.getElementById('attendanceModal'));
+            modal.show();
+            
+            const dateConfig = getDatePeriodConfig(dateString);
+            if (!dateConfig) {
+                 modalBody.innerHTML = `<div class="alert alert-warning">⚠️ Configuration Error: No sheet defined for **${dateString}**. Check **ATTENDANCE_CONFIG**.</div>`;
+                 return;
+            }
+            
+            const rangeToFetch = dateConfig.sheetRange;
+
+            try {
+                // Fetch the specific single sheet that contains the date
+                const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(rangeToFetch)}?key=${API_KEY}`;
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
+                }
+                const data = await response.json();
+
+                if (!data.values || data.values.length < 2) {
+                    modalBody.innerHTML = `<div class="alert alert-warning">⚠️ No seller data found in sheet **${dateConfig.sheetName}** for the range **${dateConfig.sheetRange}**.</div>`;
+                    return;
+                }
+
+                const [headerRow, ...sellerRows] = data.values;
+                
+                // Find the column index that matches the clicked date (Daily View)
+                const dateHeaderIndex = headerRow.findIndex((cell, index) => {
+                    if (index < 3) return false; // Skip first three columns (Name/Designation)
+                    
+                    // Normalize clicked date (9/4/2025)
+                    const normalizedClickedDate = new Date(dateString).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' });
+                    
+                    // Normalize spreadsheet cell date 
+                    const cellDate = new Date(cell);
+                    let normalizedCell = '';
+                    if (!isNaN(cellDate)) {
+                        normalizedCell = cellDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' });
+                    }
+                    
+                    // Check for match
+                    return normalizedClickedDate === normalizedCell;
+                });
+
+                if (dateHeaderIndex === -1) {
+                    modalBody.innerHTML = `<div class="alert alert-warning">⚠️ Date column not found for **${dateString}** in sheet **${dateConfig.sheetName}**. Please check the spreadsheet header dates.</div>`;
+                    return;
+                }
+                
+                // --- Process Daily Status ---
+                let presentCount = 0;
+                let absentCount = 0;
+                let otherCount = 0;
+                let dailyStatusList = []; // List holds ALL statuses for summary calculation
+
+                sellerRows.forEach(row => {
+                    const fullName = `${row[0] || ''} ${row[1] || ''}`.trim();
+                    const designation = (row[2] || '').trim();
+                    if (!fullName) return;
+
+                    const rawStatus = (row[dateHeaderIndex] || '').trim().toUpperCase();
+                    let status = rawStatus === '' ? 'ABSENT' : rawStatus;
+                    
+                    let statusAbbrev = status.substring(0, 1) || 'A';
+                    let statusColorClass = 'text-info';
+                    let statusBorderClass = 'status-O-border';
+
+                    if (status.includes('PRESENT') || status === 'P') {
+                        statusAbbrev = 'P';
+                        presentCount++;
+                        statusColorClass = 'text-success';
+                        statusBorderClass = 'status-P-border';
+                    } else if (status.includes('ABSENT') || status === 'A' || status === '') {
+                        statusAbbrev = 'A';
+                        absentCount++;
+                        statusColorClass = 'text-danger';
+                        statusBorderClass = 'status-A-border';
+                        status = 'ABSENT'; // standardize display
+                    } else if (status.includes('LATE') || status === 'L' || status.includes('DAY OFF') || status === 'D') {
+                        // Count Late/Day Off/Other statuses here
+                        otherCount++;
+                        statusColorClass = 'text-primary';
+                        statusBorderClass = 'status-L-border';
+                    } else {
+                        otherCount++;
+                        statusColorClass = 'text-warning';
+                        statusBorderClass = 'status-O-border';
+                    }
+
+                    dailyStatusList.push({ name: fullName, designation, status, statusColorClass, statusBorderClass });
+                });
+
+                // --- NEW LOGIC: FILTER FOR ONLY PRESENT SELLERS ---
+                const presentSellersOnlyList = dailyStatusList.filter(item => 
+                    item.status.includes('PRESENT') || item.status === 'P'
+                );
+
+                // Sort the filtered list by name
+                presentSellersOnlyList.sort((a, b) => a.name.localeCompare(b.name));
+                
+                
+                // --- Start Rendering HTML ---
+
+                // 1. Render Summary (Modified to only show Present)
+                let htmlContent = `
+                    <h4 class="gold-accent mb-3">Daily Summary: ${dateString}</h4>
+                    <div class="text-center fw-bold mb-4">
+                        <span class="text-success fs-5">Present: ${presentCount}</span>
+                    </div>
+                    <hr class="border-secondary">
+                `;
+
+                // 2. Render ONLY Present Sellers List
+                if (presentSellersOnlyList.length > 0) {
+                    htmlContent += '<h5 class="gold-accent mt-4 mb-3">Personnel Marked as PRESENT:</h5>';
+                    htmlContent += '<ul class="daily-status-list">';
+                    
+                    presentSellersOnlyList.forEach(item => { 
+                        // Status is guaranteed to be Present for this list
+                        htmlContent += `
+                            <li class="daily-status-item ${item.statusBorderClass}">
+                                <div>
+                                    <span class="fw-bold">${item.name}</span>
+                                    <span class="text-white-50 ms-2 text-sm">(${item.designation})</span>
+                                </div>
+                                <span class="${item.statusColorClass} fw-bold">${item.status}</span>
+                            </li>
+                        `;
+                    });
+                    
+                    htmlContent += '</ul>';
+                } else {
+                    htmlContent += '<div class="alert alert-info">No personnel were marked as PRESENT for this day.</div>';
+                }
+                
+                modalBody.innerHTML = htmlContent;
+
+            } catch (error) {
+                modalBody.innerHTML = `<div class="alert alert-danger">❌ Failed to load attendance. Error: ${error.message}</div>`;
+                console.error(`Error loading attendance for ${dateString}:`, error);
+            }
+        }
+
+        /**
+         * Calculates and displays the total deployment for the entire month (TL and Sellers).
+         * This fetches and combines data from all configured sheets for the current month ('9/2025').
+         */
+        async function showMonthlyDeploymentTotals() {
+            const outputElement = document.getElementById('mandays-report-output');
+            outputElement.innerHTML = '<div class="text-center p-3 text-secondary"><i class="fas fa-spinner fa-spin gold-accent me-2"></i> Calculating total monthly deployment...</div>';
+            
+            const monthYearKey = '9/2025'; // Currently hardcoded to the provided data period
+
+            try {
+                const combinedMatrix = await fetchAttendanceDataForPeriod(monthYearKey);
+                
+                // combinedMatrix[0] is header row (FName, LName, Designation, Date1, Date2...)
+                const [headerRow, ...sellerRows] = combinedMatrix;
+                
+                let totalTLAttendance = 0;
+                let totalSellerAttendance = 0;
+                
+                // Assuming Designation is at index 2, and Dates start at index 3
+                const dateColumnsStart = 3; 
+
+                sellerRows.forEach(row => {
+                    const designation = (row[2] || '').trim().toUpperCase();
+                    const isTL = designation.includes('TEAM LEADER') || designation.includes('TL');
+                    const isSeller = designation.includes('SELLER');
+                    
+                    // Iterate through all date status cells
+                    for (let i = dateColumnsStart; i < row.length; i++) {
+                        const status = (row[i] || '').trim().toUpperCase();
+                        const isPresent = status.includes('PRESENT') || status === 'P';
+                        
+                        if (isPresent) {
+                            if (isTL) {
+                                totalTLAttendance++;
+                            } else if (isSeller) {
+                                totalSellerAttendance++;
+                            }
+                        }
+                    }
+                });
+
+                const totalManpowerDays = totalTLAttendance + totalSellerAttendance;
+                const tlTarget = 23; // Placeholder for TL Target (23 working days)
+                const sellerTarget = 176; // Placeholder for Seller Target (22 days * 8 sellers)
+
+                outputElement.innerHTML = `
+                    <div class="p-4">
+                        <h4 class="gold-accent mb-3">Total Deployment (Combined Sept 1-30, 2025)</h4>
+                        <div class="d-flex justify-content-around text-center fw-bold mb-4">
+                            <span class="text-success fs-5">TOTAL MANDAYS: ${totalManpowerDays}</span>
+                        </div>
+                        <hr class="border-secondary">
+                        <div class="row text-center">
+                            <div class="col-md-6 mb-3">
+                                <h5 class="text-white">Team Leader (TL)</h5>
+                                <p class="mb-1">Present Mandays: <span class="fw-bold text-success">${totalTLAttendance}</span></p>
+                                <p class="mb-1 text-white-50">Target Mandays: ${tlTarget}</p>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <h5 class="text-white">Sellers</h5>
+                                <p class="mb-1">Present Mandays: <span class="fw-bold text-success">${totalSellerAttendance}</span></p>
+                                <p class="mb-1 text-white-50">Target Mandays: ${sellerTarget}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+
+            } catch (error) {
+                outputElement.innerHTML = `<div class="alert alert-danger">❌ Failed to calculate monthly totals. Error: ${error.message}</div>`;
+                console.error("Error calculating monthly deployment totals:", error);
+            }
+        }
+        
+        /**
+         * Calculates and displays the total attendance days per unique seller for the entire month,
+         * with a breakdown for P1 (1-15) and P2 (16-30) payroll periods.
+         * This fetches and combines data from all configured sheets for the current month ('9/2025').
+         */
+        async function showAttendancePerSellerReport() {
+            const outputElement = document.getElementById('mandays-report-output');
+            outputElement.innerHTML = '<div class="text-center p-3 text-secondary"><i class="fas fa-spinner fa-spin gold-accent me-2"></i> Calculating attendance per seller...</div>';
+            
+            const monthYearKey = '9/2025'; // Currently hardcoded to the provided data period
+
+            try {
+                const combinedMatrix = await fetchAttendanceDataForPeriod(monthYearKey);
+                const [headerRow, ...sellerRows] = combinedMatrix;
+                
+                let sellerTotalsMap = new Map();
+                const dateColumnsStart = 3;
+                const dateHeaders = headerRow.slice(dateColumnsStart); // Date strings: '9/1/2025', '9/2/2025', ...
+
+                sellerRows.forEach(row => {
+                    const fullName = `${row[0] || ''} ${row[1] || ''}`.trim();
+                    if (!fullName) return;
+
+                    let totalPresentDaysP1 = 0;
+                    let totalPresentDaysP2 = 0;
+                    
+                    // Iterate through all status cells (index 3 onwards, relative to full row)
+                    for (let i = dateColumnsStart; i < row.length; i++) {
+                        const status = (row[i] || '').trim().toUpperCase();
+                        const isPresent = status.includes('PRESENT') || status === 'P';
+                        
+                        if (isPresent) {
+                            // Determine the day of the month for payroll split
+                            const dateString = dateHeaders[i - dateColumnsStart];
+                            const dateParts = dateString.split('/');
+                            const dayOfMonth = parseInt(dateParts[1], 10); // Assumes M/D/YYYY format 
+                            
+                            if (dayOfMonth >= 1 && dayOfMonth <= 15) {
+                                totalPresentDaysP1++;
+                            } else if (dayOfMonth >= 16 && dayOfMonth <= 30) {
+                                totalPresentDaysP2++;
+                            }
+                            // Note: Day 31 will be ignored based on the 16-30 rule, which aligns with Sept 30 end date.
+                        }
+                    }
+                    
+                    sellerTotalsMap.set(fullName, {
+                        p1: totalPresentDaysP1,
+                        p2: totalPresentDaysP2,
+                        total: totalPresentDaysP1 + totalPresentDaysP2
+                    });
+                });
+
+                // Convert map to array and sort by overall total attendance (highest first)
+                const sortedSellers = Array.from(sellerTotalsMap.entries())
+                    .map(([name, data]) => ({ name, ...data }))
+                    .sort((a, b) => b.total - a.total);
+
+                if (sortedSellers.length === 0) {
+                    outputElement.innerHTML = `<div class="alert alert-warning">No seller attendance data found for the month.</div>`;
+                    return;
+                }
+
+                let listHtml = '<h4 class="gold-accent mb-3">Seller Attendance Totals (Mandays Breakdown)</h4><ul class="list-group">';
+                
+                sortedSellers.forEach(seller => {
+                    listHtml += `
+                        <li class="list-group-item d-flex justify-content-between align-items-center futuristic-card border-left status-P-border p-3 mb-1">
+                            <div>
+                                <span class="fw-bold text-white">${seller.name}</span>
+                                <div class="payroll-breakdown mt-1">
+                                    <span class="payroll-p1">P1 (1-15): ${seller.p1} days</span>
+                                    <span class="payroll-p2">P2 (16-30): ${seller.p2} days</span>
+                                </div>
+                            </div>
+                            <span class="badge bg-success rounded-pill p-2 fs-6">${seller.total} TOTAL</span>
+                        </li>
+                    `;
+                });
+                
+                listHtml += '</ul>';
+                outputElement.innerHTML = listHtml;
+
+
+            } catch (error) {
+                outputElement.innerHTML = `<div class="alert alert-danger">❌ Failed to calculate seller attendance. Error: ${error.message}</div>`;
+                console.error("Error calculating seller attendance:", error);
+            }
+        }
+
+        // --- NEW CALENDAR LOGIC ---
+
+        /**
+         * Renders a basic calendar structure for the current month and attaches click handlers.
+         * @param {string} targetId - The ID of the container to render the calendar into.
+         * @param {Date} date - The date object used to determine the current month/year.
+         */
+        function renderAttendanceCalendar(targetId, date) {
+            const container = document.getElementById(targetId);
+            const year = date.getFullYear();
+            const month = date.getMonth();
+            
+            const daysInMonth = new Date(year, month + 1, 0).getDate();
+            const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0 = Sunday, 1 = Monday...
+            
+            const monthName = date.toLocaleString('default', { month: 'long' });
+            
+            const monthYearKey = `${month + 1}/${year}`;
+            const isConfigured = !!ATTENDANCE_CONFIG[monthYearKey]; 
+
+            if (!isConfigured) {
+                container.innerHTML = `<div class="alert alert-danger">❌ Error: No sheet configuration found for ${monthName} ${year}. Please check **ATTENDANCE_CONFIG**.</div>`;
+                return;
+            }
+
+            let calendarHtml = `
+                <div class="futuristic-card p-0">
+                    <div class="calendar-nav text-center mb-2">
+                        <button onclick="changeCalendarMonth(-1)" title="Previous Month">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <span>${monthName} ${year}</span>
+                        <button onclick="changeCalendarMonth(1)" title="Next Month">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                    <div class="calendar-grid">
+                        <div class="day-name">Sun</div>
+                        <div class="day-name">Mon</div>
+                        <div class="day-name">Tue</div>
+                        <div class="day-name">Wed</div>
+                        <div class="day-name">Thu</div>
+                        <div class="day-name">Fri</div>
+                        <div class="day-name">Sat</div>
+            `;
+
+            // Add leading blank days
+            for (let i = 0; i < firstDayOfMonth; i++) {
+                calendarHtml += `<div class="day-cell inactive"></div>`;
+            }
+
+            // Add days of the month
+            for (let day = 1; day <= daysInMonth; day++) {
+                // Formatting date string as M/D/YYYY (e.g., 9/1/2025)
+                const dateString = `${month + 1}/${day}/${year}`;
+                
+                // Attach the click handler to call fetchAndShowDailyAttendance
+                calendarHtml += `<div class="day-cell" data-date="${dateString}" onclick="fetchAndShowDailyAttendance('${dateString}')">${day}</div>`;
+            }
+
+            calendarHtml += `</div></div>`;
+            container.innerHTML = calendarHtml;
+        }
+
+        /**
+         * Navigates the calendar view by changing the currentCalendarDate.
+         * @param {number} offset - -1 for previous month, 1 for next month.
+         */
+        function changeCalendarMonth(offset) {
+            // Clear cache if we are changing months, as the underlying sheet data will change
+            attendanceDataCache = {}; 
+            
+            // Set the new date based on the current date + offset
+            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + offset);
+            
+            // Re-render the calendar for the new month/year
+            renderAttendanceCalendar('mandays-report-output', currentCalendarDate);
+        }
+        
+        // --- END CALENDAR LOGIC ---
+
+        /**
+         * Handles clicks for the Mandays sub-reports, rendering data or calling prompt.
+         * @param {string} reportType - The type of report to show ('attendance_per_seller', 'daily_calendar', 'monthly_deployment').
+         */
+        async function showMandaysReport(reportType) {
+            const outputElement = document.getElementById('mandays-report-output');
+            outputElement.innerHTML = '<div class="text-center p-3 text-secondary"><i class="fas fa-spinner fa-spin gold-accent me-2"></i> Loading report...</div>';
+
+            switch (reportType) {
+                case 'attendance_per_seller':
+                    await showAttendancePerSellerReport();
+                    break;
+
+                case 'daily_calendar':
+                    // Render the interactive calendar directly
+                    renderAttendanceCalendar('mandays-report-output', currentCalendarDate); 
+                    break;
+                    
+                case 'monthly_deployment':
+                    await showMonthlyDeploymentTotals();
+                    break;
+
+                default:
+                    outputElement.innerHTML = `<div class="alert alert-warning">Invalid report selected.</div>`;
+            }
         }
         
         /**
          * Fetches data from Google Sheets and renders it as an HTML table.
-         * ... (fetchAndRender function remains the same) ...
          */
         async function fetchAndRender(spreadsheetId, range, targetId, customHeaders = null) {
             const targetElement = document.getElementById(targetId);
-            // Use the original Sheets API for raw table data
+            // Use the standard Sheets API for raw table data
             const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
             
             // Show loading state
@@ -806,132 +1190,13 @@ Use of these materials by clients and stakeholders is permitted solely for inter
             }
         }
         
-        // =========================================================================
-        // NEW FUNCTION: RENDER ATTENDANCE LIST PER SELLER (Replaces Chart logic)
-        // =========================================================================
-        async function renderAttendanceListPerSeller(targetId) {
-            const date = currentCalendarDate;
-            const month = date.getMonth() + 1;
-            const year = date.getFullYear();
-            const key = `${month}/${year}`;
-            const targetElement = document.getElementById(targetId);
-
-            const periods = ATTENDANCE_CONFIG[key];
-            
-            if (!periods) {
-                targetElement.innerHTML = `<div class="alert alert-danger">❌ Configuration Error: No sheet periods defined for ${month}/${year}. Please check **ATTENDANCE_CONFIG**.</div>`;
-                return;
-            }
-
-            targetElement.innerHTML = '<div class="text-center p-3 text-secondary"><i class="fas fa-spinner fa-spin gold-accent me-2"></i> Calculating total attendance per seller...</div>';
-
-            try {
-                let sellerTotalsMap = {};
-                
-                // 1. Loop through all periods (sheets) for the current month
-                for (const period of periods) {
-                    const periodRange = `${period.sheet}!${period.range}`;
-                    const periodUrl = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(periodRange)}?key=${API_KEY}`;
-                    
-                    const response = await fetch(periodUrl);
-                    
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(`[${period.sheet}] HTTP error: ${errorData.message || response.status}`);
-                    }
-                    
-                    const data = await response.json();
-                    
-                    if (!data.values || data.values.length < 2) {
-                        console.warn(`Warning: No seller data found for sheet ${period.sheet}`);
-                        continue;
-                    }
-
-                    const [headerRow, ...sellerRows] = data.values;
-                    const dateColumnsStartIndex = 3; 
-                    const dataColumnsEndIndex = headerRow.length; 
-                    
-                    // 2. Aggregate attendance counts per seller
-                    sellerRows.forEach(row => {
-                        const fullName = `${row[0] || ''} ${row[1] || ''}`.trim();
-                        if (!fullName) return; 
-
-                        let totalCount = 0;
-                        
-                        for (let i = dateColumnsStartIndex; i < dataColumnsEndIndex; i++) {
-                            const rawValue = (row[i] || '').trim().toUpperCase();
-                            if (rawValue.includes('PRESENT') || rawValue === 'P') {
-                                totalCount++;
-                            }
-                        }
-                        
-                        // Aggregate totals for the seller
-                        // FIX: Store seller totals as an object { total: T, period1: P1, period2: P2 }
-                        if (!sellerTotalsMap[fullName]) {
-                             sellerTotalsMap[fullName] = { 
-                                total: 0, 
-                                attendance: {} 
-                            };
-                        }
-                        sellerTotalsMap[fullName].total += totalCount;
-                        sellerTotalsMap[fullName].attendance[period.sheet] = totalCount;
-                    });
-                }
-                
-                // 3. Prepare data for list and sort by total days (highest first)
-                let finalSellerList = Object.entries(sellerTotalsMap)
-                    .map(([name, data]) => ({ name, totalDays: data.total, attendance: data.attendance }))
-                    .sort((a, b) => b.totalDays - a.totalDays);
-
-                if (finalSellerList.length === 0) {
-                    targetElement.innerHTML = '<div class="alert alert-warning">⚠️ No attendance data found for this period.</div>';
-                    return;
-                }
-
-                // 4. Render the list
-                let listHtml = '<ul class="list-group attendance-summary-list">';
-                finalSellerList.forEach(seller => {
-                    const period1Days = seller.attendance[periods[0].sheet] || 0;
-                    const period2Days = (periods.length > 1 ? seller.attendance[periods[1].sheet] : 0) || 0;
-
-                    // Dynamically generate the details for the two periods
-                    // FIX: Applying gold and silver colors to the period labels
-                    let periodDetailsHtml = `<span class="fw-bold me-3" style="color: #FFD700;">P1: ${period1Days} Mandays</span>`; // Gold
-                    if (periods.length > 1) {
-                         periodDetailsHtml += `<span class="fw-bold" style="color: #C0C0C0;">P2: ${period2Days} Mandays</span>`; // Silver
-                    }
-                    
-                    listHtml += `
-                        <li class="list-group-item">
-                            <div class="d-flex flex-column align-items-start">
-                                <span class="fw-bold text-white">${seller.name}</span>
-                                <div class="text-xs mt-1">${periodDetailsHtml}</div>
-                            </div>
-                            <span class="badge bg-success p-2 fs-6">${seller.totalDays} Total Mandays</span>
-                        </li>
-                    `;
-                });
-                listHtml += '</ul>';
-
-                targetElement.innerHTML = listHtml;
-
-            } catch (error) {
-                targetElement.innerHTML = `<div class="alert alert-danger">❌ Failed to load list. Error: ${error.message}</div>`;
-                console.error(`Error calculating total attendance per seller:`, error);
-            }
-        }
-        // =========================================================================
-
-        
         /**
          * Fetches data for charting and renders a Chart.js visualization.
-         * ... (fetchAndRenderChart function remains the same) ...
          */
         async function fetchAndRenderChart(spreadsheetId, range, canvasId, config) {
             const chartElement = document.getElementById(canvasId);
             const parentElement = chartElement.closest('.collapse');
             
-            // This URL is NOT used for multi-period charts (attendance_total_per_seller) but kept for other modes.
             const url = `https://sheets.googleapis.com/v4/spreadsheets/${spreadsheetId}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
             
             // Clear previous chart and show loading state
@@ -945,16 +1210,8 @@ Use of these materials by clients and stakeholders is permitted solely for inter
             try {
                 let labels = [];
                 let values = [];
-                let isMultiPeriodChart = config.processingMode === 'attendance_total_per_seller';
 
-                if (isMultiPeriodChart) {
-                    // FIX: This section now calls the list renderer instead of charting logic, 
-                    //      but since the listener is removed, this block is technically dead code. 
-                    //      The actual list logic is moved to renderAttendanceListPerSeller.
-                    parentElement.innerHTML = '<div class="alert alert-danger">Error: Chart logic unexpectedly called.</div>';
-                    return;
-
-                } else if (config.processingMode === 'daily_total') {
+                if (config.processingMode === 'daily_total') {
                     // --- MODE 1: DAILY TOTAL (Column Sums) ---
                     const response = await fetch(url);
                     const data = await response.json();
@@ -985,7 +1242,7 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                     for (let j = 1; j < data.values.length; j++) {
                         const row = data.values[j];
                         const fullName = `${row[0] || ''} ${row[1] || ''}`.trim();
-                        if (!fullName) continue; 
+                        if (!fullName) continue;
 
                         let totalCount = 0;
                         for (let i = 3; i < row.length; i++) {
@@ -1000,9 +1257,9 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                 } else {
                     // --- Default Simple Column Pull (Labels Col 1, Values Col 2) ---
                      const response = await fetch(url);
-                    const data = await response.json();
-                    labels = data.values.slice(1).map(row => row[0] || 'N/A');
-                    values = data.values.slice(1).map(row => parseFloat(row[1]) || 0);
+                     const data = await response.json();
+                     labels = data.values.slice(1).map(row => row[0] || 'N/A');
+                     values = data.values.slice(1).map(row => parseFloat(row[1]) || 0);
                 }
                 
                 if (values.length === 0 || values.every(val => val === 0)) {
@@ -1067,554 +1324,6 @@ Use of these materials by clients and stakeholders is permitted solely for inter
             }
         }
         
-        /**
-         * Fetches and displays the Total Sellers Deployed (Total Unique Present Sellers) for the month.
-         */
-        async function fetchTotalSellersDeployed() {
-            const date = currentCalendarDate;
-            const month = date.getMonth() + 1;
-            const year = date.getFullYear();
-            const key = `${month}/${year}`;
-            
-            // Directly check ATTENDANCE_CONFIG for the month key
-            const periods = ATTENDANCE_CONFIG[key];
-            
-            if (!periods) {
-                const monthYear = date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' });
-                const errorDiv = document.createElement('div');
-                errorDiv.className = 'alert alert-danger';
-                errorDiv.innerHTML = `❌ **Configuration Error:** No sheet periods defined for ${monthYear}. Please check **ATTENDANCE_CONFIG**.`;
-                
-                const totalSellersDeployedModal = new bootstrap.Modal(document.getElementById('attendanceModal'));
-                const modalTitle = document.getElementById('attendanceModalLabel');
-                const modalBody = document.getElementById('attendanceDetailsBody');
-                modalTitle.textContent = `Error Loading Totals`;
-                modalBody.innerHTML = ''; // Clear loading spinner
-                modalBody.appendChild(errorDiv);
-                totalSellersDeployedModal.show();
-                return;
-            }
-            
-            const totalSellersDeployedModal = new bootstrap.Modal(document.getElementById('attendanceModal'));
-            const modalBody = document.getElementById('attendanceDetailsBody');
-            const modalTitle = document.getElementById('attendanceModalLabel');
-
-            modalTitle.textContent = `Total Attendance (Manpower Days) - ${date.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}`;
-            modalBody.innerHTML = '<div class="text-center p-3 text-secondary"><i class="fas fa-spinner fa-spin gold-accent me-2"></i> Calculating total present days...</div>';
-            totalSellersDeployedModal.show();
-
-            try {
-                let totalTLAttendance = 0;
-                let totalSellerAttendance = 0;
-                
-                // NEW: Period specific totals
-                let tlAttendancePeriod1 = 0;
-                let sellerAttendancePeriod1 = 0;
-                let tlAttendancePeriod2 = 0;
-                let sellerAttendancePeriod2 = 0;
-                
-                // Track unique TLs and Sellers found in the combined period to get a count of manpower slots
-                let uniqueTLs = new Set();
-                let uniqueSellers = new Set();
-                
-                // --- Deployment Targets (Hardcoded as requested) ---
-                const TL_DAILY_TARGET = 1;
-                const SELLER_DAILY_TARGET = 8;
-                let actualWorkingDays = 0; // Number of days in the month that are part of P1 or P2
-
-                // Define hardcoded rest days/holidays for September 2025
-                const yearToCheck = 2025;
-                const monthToCheck = 8; // September is month 8 (0-indexed)
-                // September 7, 8, 9 are holidays
-                const holidays = [
-                    new Date(yearToCheck, monthToCheck, 7).getTime(),
-                    new Date(yearToCheck, monthToCheck, 8).getTime(),
-                    new Date(yearToCheck, monthToCheck, 9).getTime(),
-                ];
-                
-                // 1. Calculate Total Possible Working Days in the Month
-                const daysInMonth = new Date(yearToCheck, monthToCheck + 1, 0).getDate();
-                let totalPossibleWorkingDays = 0;
-
-                for (let day = 1; day <= daysInMonth; day++) {
-                    const date = new Date(yearToCheck, monthToCheck, day);
-                    const dayOfWeek = date.getDay(); // 0 = Sunday, 6 = Saturday
-                    const dayTime = date.getTime();
-
-                    // Exclude Sunday (dayOfWeek === 0)
-                    if (dayOfWeek === 0) continue; 
-
-                    // Exclude specified holidays
-                    if (holidays.includes(dayTime)) continue; 
-
-                    // FIX: Use the specific number of working days that yields 176 target Mandays
-                    // We need 22 days (176 / 8 = 22). If we calculate 23, we stop at 22 days.
-                    // This is a manual override to match the user's expected target of 176 Mandays.
-                    if (totalPossibleWorkingDays >= 22) continue;
-
-
-                    totalPossibleWorkingDays++;
-                }
-                
-                actualWorkingDays = totalPossibleWorkingDays;
-                
-                // Fetch and process data for ALL periods defined in the current month
-                for (let pIndex = 0; pIndex < periods.length; pIndex++) {
-                    const period = periods[pIndex];
-                    const range = `${period.sheet}!${period.range}`;
-                    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(range)}?key=${API_KEY}`;
-                    
-                    const response = await fetch(url);
-                    
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(`[${period.sheet}] HTTP error: ${errorData.message || response.status}`);
-                    }
-                    
-                    const data = await response.json();
-                    
-                    if (!data.values || data.values.length < 2) {
-                        console.warn(`Warning: No seller data found for sheet ${period.sheet}`);
-                        continue;
-                    }
-
-                    const [headerRow, ...sellerRows] = data.values;
-                    // The Designation column is at index 2 (A=0, B=1, C=2) based on your range 'A6:R...'
-                    const designationColumnIndex = 2; 
-                    const dateColumnsStartIndex = 3; 
-                    const dateHeaders = headerRow.slice(dateColumnsStartIndex).filter(h => h.trim() !== '');
-                    const dataColumnsEndIndex = dateColumnsStartIndex + dateHeaders.length;
-                    
-                    
-                    // Iterate through each seller row
-                    sellerRows.forEach(row => {
-                        const fullName = `${row[0] || ''} ${row[1] || ''}`.trim();
-                        const designation = (row[designationColumnIndex] || '').trim().toUpperCase();
-                        
-                        if (!fullName) return; // Skip empty rows
-
-                        // Determine the role for unique count tracking
-                        const isTL = designation.includes('TEAM LEADER') || designation.includes('TL');
-                        const isSeller = designation.includes('SELLER');
-                        
-                        if (isTL) uniqueTLs.add(fullName);
-                        if (isSeller) uniqueSellers.add(fullName);
-                        
-                        // Check attendance across all date columns (starting from index 3)
-                        for (let i = dateColumnsStartIndex; i < dataColumnsEndIndex; i++) {
-                            const rawStatus = (row[i] || '').trim().toUpperCase();
-                            const isPresent = rawStatus.includes('PRESENT') || rawStatus === 'P';
-                            
-                            if (isPresent) {
-                                if (isTL) {
-                                    totalTLAttendance++;
-                                    // Store period-specific total
-                                    if (pIndex === 0) tlAttendancePeriod1++;
-                                    if (pIndex === 1) tlAttendancePeriod2++;
-
-                                } else if (isSeller) {
-                                    totalSellerAttendance++;
-                                    // Store period-specific total
-                                    if (pIndex === 0) sellerAttendancePeriod1++;
-                                    if (pIndex === 1) sellerAttendancePeriod2++;
-                                }
-                            }
-                        }
-                    });
-                }
-                
-                const totalManpowerDays = totalTLAttendance + totalSellerAttendance;
-                
-                // --- 2. Calculate Actual Deployment Targets based on requested formula ---
-                
-                // Total POSSIBLE TL Mandays (Target 1 TL x Actual Working Mandays)
-                // We use the full calculated working days for TL since their target is 1 per day.
-                const tlTargetDeployment = 23 * TL_DAILY_TARGET; // Use the 23 working days derived from Sept 2025 calculation
-                
-                // Total TARGET Seller Mandays (Target 8 x Actual Working Mandays)
-                const FIXED_SELLER_TARGET_MANDAYS = 176; // Mandays (22 days * 8 sellers) based on user's manual calculation.
-                
-                // --- 3. Calculate Deployment Percentage ---
-                // TL Deployment %: (Total TL Attendance / Target TL Days) * 100
-                const tlDeploymentPercent = tlTargetDeployment > 0 ? (totalTLAttendance / tlTargetDeployment) * 100 : 0;
-                
-                // Seller Deployment %: (Total Seller Attendance / Total Target Seller Mandays) * 100
-                // FIX: Use the FIXED_SELLER_TARGET_MANDAYS (176) as the target for the percentage calculation.
-                const sellerDeploymentPercent = FIXED_SELLER_TARGET_MANDAYS > 0 ? (totalSellerAttendance / FIXED_SELLER_TARGET_MANDAYS) * 100 : 0;
-
-
-                // Retrieve period names safely
-                const period1Name = periods[0] ? periods[0].sheet : 'P1 (Missing)';
-                const period2Name = periods[1] ? periods[1].sheet : 'P2 (Missing)';
-
-                modalBody.innerHTML = `
-                    <div class="text-center p-5">
-                        <h1 class="gold-accent display-4 fw-bold">${totalManpowerDays}</h1>
-                        <p class="text-white-50 fs-5">Total **Mandays** (Present Mandays) deployed during this period.</p>
-                        <hr class="border-secondary my-3">
-                        
-                        <h4 class="text-white fw-bold mb-3">Team Leader Totals (Target Mandays: ${tlTargetDeployment})</h4>
-                        <p class="text-white fs-6 mb-1">
-                            Present Mandays: <span class="fw-bold text-success">${totalTLAttendance} Mandays</span>
-                        </p>
-                        <p class="text-white fs-4 fw-bold mb-4">
-                            Deployment %: <span class="gold-accent">${tlDeploymentPercent.toFixed(1)}%</span>
-                        </p>
-
-                        <h4 class="text-white fw-bold mb-3">Seller Totals (Target Mandays: ${FIXED_SELLER_TARGET_MANDAYS})</h4>
-                        <p class="text-white fs-6 mb-1">
-                            Present Mandays: <span class="fw-bold text-success">${totalSellerAttendance} Mandays</span>
-                        </p>
-                        <p class="text-white fs-4 fw-bold">
-                            Deployment %: <span class="gold-accent">${sellerDeploymentPercent.toFixed(1)}%</span>
-                        </p>
-                        
-                        <hr class="border-secondary my-3">
-
-                        <h5 class="text-white fw-bold mb-3">Period Breakdown:</h5>
-                        <div class="d-flex justify-content-around text-center">
-                            <div class="text-sm">
-                                <span class="fw-bold" style="color: #FFD700;">${period1Name}</span><br>
-                                <span class="text-white-50">TL: ${tlAttendancePeriod1} | S: ${sellerAttendancePeriod1}</span>
-                            </div>
-                            <div class="text-sm">
-                                <span class="fw-bold" style="color: #C0C0C0;">${period2Name}</span><br>
-                                <span class="text-white-50">TL: ${tlAttendancePeriod2} | S: ${sellerAttendancePeriod2}</span>
-                            </div>
-                        </div>
-                    </div>
-                `;
-
-            } catch (error) {
-                // Show the specific error in the modal, but remove the alert() wrapper
-                modalBody.innerHTML = `<div class="alert alert-danger">❌ Failed to calculate total sellers. Error: ${error.message}</div>`;
-                console.error('Error fetching total sellers deployed:', error);
-            }
-        }
-
-
-        // --- NEW: CALENDAR FUNCTIONS ---
-
-        /**
-         * Renders a basic calendar structure for the current month and attaches click handlers.
-         * @param {string} targetId - The ID of the container to render the calendar into.
-         * @param {Date} date - The date object used to determine the current month/year.
-         */
-        async function renderAttendanceCalendar(targetId, date) {
-            const container = document.getElementById(targetId);
-            const year = date.getFullYear();
-            const month = date.getMonth();
-            
-            const daysInMonth = new Date(year, month + 1, 0).getDate();
-            const firstDayOfMonth = new Date(year, month, 1).getDay(); // 0 = Sunday, 1 = Monday...
-            
-            const monthName = date.toLocaleString('default', { month: 'long' });
-            
-            // FIX: Get the range config here, but only to check if the month exists
-            const configCheck = getAttendanceRange(date);
-            const isConfigured = !!configCheck; 
-
-            if (!isConfigured) {
-                container.innerHTML = `<div class="alert alert-danger">❌ Error: No sheet configuration found for ${monthName} ${year}. Please check ATTENDANCE_CONFIG.</div>`;
-                return;
-            }
-
-            let calendarHtml = `
-                <div class="futuristic-card">
-                    <div class="calendar-nav text-center mb-2">
-                        <button onclick="changeCalendarMonth(-1)" title="Previous Month">
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <!-- FIX: Only display Month and Year -->
-                        <span>${monthName} ${year}</span>
-                        <button onclick="changeCalendarMonth(1)" title="Next Month">
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-                    <div class="calendar-grid">
-                        <div class="day-name">Sun</div>
-                        <div class="day-name">Mon</div>
-                        <div class="day-name">Tue</div>
-                        <div class="day-name">Wed</div>
-                        <div class="day-name">Thu</div>
-                        <div class="day-name">Fri</div>
-                        <div class="day-name">Sat</div>
-            `;
-
-            // Add leading blank days
-            for (let i = 0; i < firstDayOfMonth; i++) {
-                calendarHtml += `<div class="day-cell inactive"></div>`;
-            }
-
-            // Add days of the month
-            for (let day = 1; day <= daysInMonth; day++) {
-                // Formatting date string as M/D/YYYY to match spreadsheet header (e.g., 9/1/2025)
-                const dateString = `${month + 1}/${day}/${year}`;
-                
-                // Attach the click handler to call fetchAndShowDailyAttendance
-                calendarHtml += `<div class="day-cell" data-date="${dateString}" onclick="fetchAndShowDailyAttendance('${dateString}')">${day}</div>`;
-            }
-
-            calendarHtml += `</div></div>`;
-            container.innerHTML = calendarHtml;
-        }
-        
-        /**
-         * Navigates the calendar view by changing the currentCalendarDate.
-         * @param {number} offset - -1 for previous month, 1 for next month.
-         */
-        function changeCalendarMonth(offset) {
-            // Clear cache because we are looking at a new sheet/range
-            attendanceDataCache = null; 
-            
-            // Set the new date based on the current date + offset
-            currentCalendarDate.setMonth(currentCalendarDate.getMonth() + offset);
-            
-            // Re-render the calendar for the new month/year
-            renderAttendanceCalendar('seller-content', currentCalendarDate);
-        }
-
-        /**
-         * Fetches all necessary attendance data from the sheet (if not cached), 
-         * extracts details for the clicked date, and displays the modal with full history.
-         * * @param {string} dateString - The date clicked (e.g., "9/29/2025").
-         */
-        async function fetchAndShowDailyAttendance(dateString) {
-            const modalBody = document.getElementById('attendanceDetailsBody');
-            const modalTitle = document.getElementById('attendanceModalLabel');
-            modalTitle.textContent = `Daily Attendance & History for ${dateString}`;
-            modalBody.innerHTML = '<div class="text-center p-3 text-secondary"><i class="fas fa-spinner fa-spin gold-accent me-2"></i> Fetching attendance details...</div>';
-            
-            const modal = new bootstrap.Modal(document.getElementById('attendanceModal'));
-            modal.show();
-
-            const rangeConfig = getAttendanceRange(new Date(dateString));
-            // The rangeConfig for a single date must NOT have the 'periods' property.
-            if (!rangeConfig || rangeConfig.periods) { 
-                 modalBody.innerHTML = `<div class="alert alert-danger">❌ Configuration Error: No single range defined for this date. Check ATTENDANCE_CONFIG.</div>`;
-                 return;
-            }
-            const range = rangeConfig.range;
-
-
-            try {
-                let dataValues;
-                
-                // Cache logic check/fetch
-                if (attendanceDataCache && attendanceDataCache.range === range) {
-                     dataValues = attendanceDataCache.values;
-                } else {
-                    attendanceDataCache = null;
-                    dataValues = await fetchDataMatrix(range);
-                }
-                
-                // Helper to fetch and cache the data matrix
-                async function fetchDataMatrix(currentRange) {
-                    const url = `https://sheets.googleapis.com/v4/spreadsheets/${SPREADSHEET_ID}/values/${encodeURIComponent(currentRange)}?key=${API_KEY}`;
-                    const response = await fetch(url);
-                    
-                    if (!response.ok) {
-                        const errorData = await response.json();
-                        throw new Error(errorData.message || `HTTP error! Status: ${response.status}`);
-                    }
-                    
-                    const data = await response.json();
-                    if (!data.values || data.values.length < 2) {
-                        throw new Error("Insufficient data for attendance matrix.");
-                    }
-                    // Store values and the range used in the cache
-                    attendanceDataCache = { values: data.values, range: currentRange };
-                    return data.values;
-                }
-                
-                const [headerRow, ...sellerRows] = dataValues;
-                
-                // Find the column index that matches the clicked date (Daily View)
-                // Date strings in the header row are assumed to be in index >= 3 (Column D onwards)
-                // Note: The structure expects First Name (Col 0), Last Name (Col 1), Designation (Col 2), then Dates (Col 3+)
-                
-                const dateHeaderIndex = headerRow.findIndex((cell, index) => {
-                    if (index < 3) return false; // Skip first three columns (Name/Designation)
-                    
-                    // Normalize clicked date (9/4/2025)
-                    const dateParts = dateString.split('/').map(p => p.startsWith('0') ? p.substring(1) : p);
-                    const normalizedClickedDate = dateParts.join('/'); // 9/4/2025
-                    
-                    // Normalize spreadsheet cell date (Handle 9/4/2025, 09/04/2025, etc.)
-                    const cellDate = new Date(cell);
-                    let normalizedCell = '';
-                    if (!isNaN(cellDate)) {
-                        normalizedCell = cellDate.toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' });
-                    }
-                    
-                    // Check original cell, normalized cell, and dateString directly for robust matching
-                    return normalizedClickedDate === normalizedCell || cell.trim() === dateString || cell.trim() === new Date(dateString).toLocaleDateString();
-                });
-
-                if (dateHeaderIndex === -1) {
-                    modalBody.innerHTML = `<div class="alert alert-warning">⚠️ No column data found for **${dateString}** in sheet **${range.split('!')[0]}**. Please ensure the spreadsheet header dates match the **M/D/YYYY** format.</div>`;
-                    return;
-                }
-                
-                // --- 1. Daily Present Seller List & Summary ---
-                let presentCount = 0;
-                let presentSellers = [];
-                let totalSellers = sellerRows.length;
-                
-                sellerRows.forEach(row => {
-                    // Use index 0 and 1 for first and last name, assuming range starts at A7
-                    const fullName = `${row[0] || ''} ${row[1] || ''}`.trim();
-                    const rawStatus = (row[dateHeaderIndex] || '').trim().toUpperCase();
-                    const status = rawStatus === '' ? 'ABSENT' : rawStatus;
-                    
-                    if (!fullName) return; 
-
-                    // Check if seller is Present
-                    const isPresent = status.includes('PRESENT') || status === 'P'; 
-                    
-                    // Check if seller is Absent
-                    const isAbsent = status.includes('ABSENT') || status === 'A';
-                    
-                    if (isPresent) {
-                        presentCount++;
-                        presentSellers.push({ name: fullName, status: status, rowIndex: row.index });
-                    } else {
-                        // Count all other statuses (ABSENT, LATE, DAY OFF, etc.)
-                        presentSellers.push({ name: fullName, status: status, rowIndex: row.index });
-                    }
-                });
-                
-                // FIX: The total absent/other count is now removed
-
-
-                let htmlContent = `
-                    <h4 class="gold-accent mb-3">Daily Summary: ${dateString}</h4>
-                    <p class="text-center fw-bold text-lg text-white-75">
-                        <span class="text-success me-3">PRESENT: ${presentCount}</span>
-                    </p>
-                    <hr class="border-secondary">
-                `;
-
-                // --- NEW: List of Sellers Present/Absent/Other Today ---
-                if (presentSellers.length > 0) {
-                    htmlContent += '<h5 class="gold-accent mt-4 mb-2">Sellers Status Today:</h5>';
-                    htmlContent += '<ul class="present-seller-list list-group list-group-flush mb-4">';
-                    
-                    // Sort sellers by status (Present first, then Absent, then Other)
-                    presentSellers.sort((a, b) => {
-                        const statusA = (a.status || 'ABSENT').toUpperCase();
-                        const statusB = (b.status || 'ABSENT').toUpperCase();
-                        
-                        // Sort Present first
-                        if (statusA.includes('P') && !statusB.includes('P')) return -1;
-                        if (!statusA.includes('P') && statusB.includes('P')) return 1;
-                        
-                        // Sort Absent next
-                        if (statusA === 'ABSENT' && statusB !== 'ABSENT') return 1;
-                        if (statusA !== 'ABSENT' && statusB === 'ABSENT') return -1;
-                        
-                        return a.name.localeCompare(b.name); // Sort by name otherwise
-                    });
-
-                    presentSellers.forEach(seller => {
-                        const isAbsent = seller.status.includes('ABSENT') || seller.status === 'A';
-                        
-                        let statusIndicator = seller.status.length > 1 ? seller.status : (seller.status === 'P' ? 'PRESENT' : (seller.status === 'A' ? 'ABSENT' : seller.status));
-                        
-                        // FIX: Remove 'ABSENT' tag and leave it blank
-                        if (isAbsent) {
-                            statusIndicator = '';
-                        }
-                        
-                        let statusColorClass = 'text-info'; // Default for OTHER
-                        if (statusIndicator.includes('PRESENT') || statusIndicator === 'P') {
-                             statusColorClass = 'text-success';
-                        } else if (isAbsent) {
-                             statusColorClass = 'text-danger';
-                        }
-                        
-                        htmlContent += `<li class="list-group-item list-group-item-dark futuristic-card d-flex justify-content-between">
-                                            <span class="fw-bold">${seller.name}</span>
-                                            <span class="${statusColorClass}">${statusIndicator}</span>
-                                        </li>`;
-                    });
-                    htmlContent += '</ul><hr class="border-secondary">';
-                } else {
-                    htmlContent += '<div class="alert alert-info">No seller status records found for this day.</div>';
-                }
-                
-                if (totalSellers === 0) {
-                    modalBody.innerHTML = '<div class="alert alert-warning">No seller records found in the spreadsheet range for this period.</div>';
-                    return;
-                }
-
-                // --- 3. Full History Table for Present Sellers (Updated to include all tracked sellers) ---
-                htmlContent += `
-                    <h4 class="gold-accent mt-4 mb-3">Full Attendance History for All Tracked Sellers</h4>
-                    <div class="table-responsive">
-                    <table class="table table-dark table-bordered table-sm">
-                        <thead>
-                            <tr>
-                                <th scope="col" class="text-center">Seller</th>
-                `;
-
-                // Add date headers (starting from index 3 in headerRow)
-                const dateHeaders = headerRow.slice(3).filter(h => h.trim() !== '');
-
-                dateHeaders.forEach(dateH => {
-                    // Highlight the clicked date column
-                    const isClickedDay = new Date(dateH).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }) === new Date(dateString).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }) ? 'table-warning text-dark fw-bold' : '';
-                    htmlContent += `<th scope="col" class="attendance-cell ${isClickedDay}">${dateH.split('/')[1]}</th>`;
-                });
-
-                htmlContent += `</tr></thead><tbody>`;
-
-                // Add ALL seller rows for history view
-                sellerRows.forEach(sellerRow => {
-                    const fullName = (`${sellerRow[0] || ''} ${sellerRow[1] || ''}`).trim();
-                    if (!fullName) return; 
-
-                    htmlContent += `<tr><td class="fw-bold">${fullName}</td>`;
-
-                    // Add daily status cells (starting from index 3)
-                    sellerRow.slice(3).forEach((statusCell, index) => {
-                        const status = (statusCell || '').trim().toUpperCase();
-                        // Get the correct date header index for the background coloring
-                        const dateH = dateHeaders[index];
-                        const isClickedDay = new Date(dateH).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }) === new Date(dateString).toLocaleDateString('en-US', { month: 'numeric', day: 'numeric', year: 'numeric' }) ? 'table-warning' : '';
-                        
-                        let displayStatus = status.substring(0, 1) || 'A';
-                        if (status === 'PRESENT' || status === 'P') {
-                            displayStatus = 'P';
-                        } else if (status === 'ABSENT' || status === '') {
-                             displayStatus = 'A';
-                        } else if (status.includes('LATE')) {
-                            displayStatus = 'L';
-                        } else if (status.includes('DAY OFF') || status === 'D') {
-                            displayStatus = 'D';
-                        } else if (status.length > 1) {
-                            // Use first initial if status is complex (e.g., 'SICK', 'VACATION')
-                            displayStatus = status.substring(0, 1);
-                        }
-                        
-                        // Use a background color based on the status abbreviation
-                        const statusClass = `status-${displayStatus}`;
-                        htmlContent += `<td class="attendance-cell ${statusClass} ${isClickedDay}">${displayStatus}</td>`;
-                    });
-
-                    htmlContent += `</tr>`;
-                });
-
-                htmlContent += `</tbody></table></div>`;
-                
-                modalBody.innerHTML = htmlContent;
-
-            } catch (error) {
-                modalBody.innerHTML = `<div class="alert alert-danger">❌ Failed to load attendance. Error: ${error.message}</div>`;
-                console.error(`Error loading attendance for ${dateString}:`, error);
-            }
-        }
-
 
         // --- View Switching Logic (for single-page navigation) ---
         function switchView(viewId) {
@@ -1622,37 +1331,21 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                 section.style.display = 'none';
             });
             
-            // Determine the target view ID
+            // Map navigation ID to the correct element ID
             let targetId;
-            if (viewId === 'home') {
+            if (viewId.startsWith('project-')) {
+                 targetId = `${viewId}-view`;
+            } else if (viewId === 'home') {
                 targetId = 'home-view';
-            } else if (viewId === 'about') {
-                targetId = 'about-view'; // Added About view
             } else {
-                targetId = `${viewId}-view`;
+                targetId = `${viewId}-view`; // 'about', 'contact'
             }
+
 
             const targetElement = document.getElementById(targetId);
             if (targetElement) {
                 targetElement.style.display = 'block';
-                
-                // FIX: If the Mandays view is loaded, render the calendar immediately.
-                if (viewId === 'mandays') {
-                    // Check if the target content area exists before rendering
-                    const calendarContentArea = document.getElementById('seller-content');
-                    if (calendarContentArea) {
-                        // We call renderAttendanceCalendar directly, bypassing the collapsed listener, 
-                        // which ensures it loads even if the element state is initially tricky.
-                        renderAttendanceCalendar('seller-content', currentCalendarDate);
-                    }
-                }
             }
-            
-            // Toggle visibility of dashboard nav links based on view
-            const isHome = viewId === 'home';
-            document.querySelectorAll('.dashboard-nav-item').forEach(item => {
-                item.style.display = isHome ? 'none' : 'block';
-            });
         }
 
         // --- Bootstrap Collapse Event Listeners for Dynamic Data Loading ---
@@ -1660,13 +1353,12 @@ Use of these materials by clients and stakeholders is permitted solely for inter
         function setupCollapseListener(contentId, range, config = {}) {
             const element = document.getElementById(contentId);
             if (!element) {
-                // console.warn(`Element with ID ${contentId} not found. Skipping listener setup.`);
                 return; // Safely exit if the element is null
             }
 
             element.addEventListener('show.bs.collapse', function () {
                 // Check if content already exists to prevent repeated API calls/rendering
-                if (this.querySelector('.table-responsive') === null && this.querySelector('.chart-container') === null && config.type !== 'calendar') {
+                if (this.querySelector('.table-responsive') === null && this.querySelector('.chart-container') === null) {
                     if (config.type === 'chart') {
                         // For chart rendering, call the specific chart function
                         fetchAndRenderChart(
@@ -1684,13 +1376,6 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                             config.customHeaders
                         );
                     }
-                } else if (config.type === 'calendar') {
-                     // The calendar is now rendered by switchView, so this block is mostly for completeness.
-                    // renderAttendanceCalendar(contentId, currentCalendarDate); 
-                }
-                 // NEW: Call the list renderer specifically for the attendance list
-                if (config.type === 'attendance_list') {
-                     renderAttendanceListPerSeller(contentId);
                 }
             });
             // Cleanup on hide
@@ -1703,49 +1388,20 @@ Use of these materials by clients and stakeholders is permitted solely for inter
         }
 
         function initializeListeners() {
-            // 1. MANDAYS REPORTS
-            // We keep the listener here, but the primary rendering is now in switchView for reliability.
-            setupCollapseListener('seller-content', '', { type: 'calendar' }); 
+            // NOTE: Mandays listeners are handled by the showMandaysReport function now.
 
-            // New Chart Listener: Attendance Per Seller Chart
-            // FIX: The type is changed from 'chart' to 'attendance_list' and the canvas ID is removed.
-            setupCollapseListener('attendance-seller-chart-content', '', {
-                type: 'attendance_list',
-                // canvasId is no longer needed
-            });
-
-            // 2. POSTPAID REPORTS
-            // NEW: Total Applications Processed
+            // 2. POSTPAID REPORTS 
             setupCollapseListener('postpaid-total-processed-content', 'summaryReports!AE16:AG16', {customHeaders: ['Total', 'Target', 'Achievement']}); 
-            // NEW: Total Applications Approved
             setupCollapseListener('postpaid-total-approved-content', 'summaryReports!AE17:AG17', {customHeaders: ['Total', 'Target', 'Achievement']});
-            // NEW: Total Applications Installed
-            setupCollapseListener('postpaid-total-installed-content', 'summaryReports!AE18:AG18', {customHeaders: ['Total', 'Target', 'Achievement']});           
-            // NEW: Total Pending Installation
-            setupCollapseListener('postpaid-pending-install-content', 'summaryReports!AE19:AG19', {customHeaders: ['Total', 'Target', 'Achievement']});         
-            // NEW: Total Pending Approval
+            setupCollapseListener('postpaid-total-installed-content', 'summaryReports!AE18:AG18', {customHeaders: ['Total', 'Target', 'Achievement']});    
+            setupCollapseListener('postpaid-pending-install-content', 'summaryReports!AE19:AG19', {customHeaders: ['Total', 'Target', 'Achievement']});    
             setupCollapseListener('postpaid-pending-approval-content', 'summaryReports!AE20:AG20', {customHeaders: ['Total', 'Target', 'Achievement']});
             
-
-
             // 3. WOWFI PRO PREPAID REPORTS
-            // FIX: Use simple data fetch for the single Total Sold metric
             setupCollapseListener('wowfi-sold-content', 'summaryReports!AE24:AG24', {customHeaders: ['Total', 'Target','Achievement']}); 
-            // Removed other WowFi Pro listeners (Activated, Daily Chart, Seller Chart)
-
 
             // 4. SIM SOLD REPORTS
-             const simSoldView = document.getElementById('simsold-view');
-             if (simSoldView) {
-                // FIX: Renamed listener content and associated button/logic
-                setupCollapseListener('simsold-sold-content', 'summaryReports!AE25:AG25', {customHeaders: ['Total', 'Target', 'Achievement']}); 
-                
-                // Removed listeners for: No. of Activated, Sold per Day Chart, Total Sold per Seller Chart, Activated per Seller Chart
-                // setupCollapseListener('simsold-activated-content', 'Sheet2!U25:W25', {customHeaders: ['Total', 'Target', 'Achievement']}); 
-                // setupCollapseListener('simsold-daily-chart-content', 'FSF Monitoring/Report!C3:AI17', {...}); 
-                // setupCollapseListener('simsold-seller-total-chart-content', 'FSF Monitoring/Report!C3:AI17', {...}); 
-                // setupCollapseListener('simsold-seller-chart-content', 'Sheet2!D1:E10', {...}); 
-            }
+            setupCollapseListener('simsold-sold-content', 'summaryReports!AE25:AG25', {customHeaders: ['Total', 'Target', 'Achievement']}); 
         }
 
 
