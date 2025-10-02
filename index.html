@@ -231,37 +231,37 @@
 
             <!-- Start Links -->
             <div class="collapse navbar-collapse" id="navbarResponsive">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto" id="main-nav-links">
                     <!-- Home -->
                     <li class="nav-item">
                         <a class="nav-link" href="#" onclick="switchView('home')">
                             <i class="fas fa-home gold-accent"></i> Home
                         </a>
                     </li>
-                    <!-- Mandays -->
-                    <li class="nav-item">
+                    
+                    <!-- DYNAMIC DASHBOARD NAVIGATION (Initially hidden, revealed on Project click) -->
+                    <li class="nav-item dashboard-nav-item" style="display: none;">
                         <a class="nav-link" href="#" onclick="switchView('mandays')">
                             <i class="fas fa-calendar-alt gold-accent"></i> Manpower Monitoring
                         </a>
                     </li>
-                    <!-- Postpaid Monitoring -->
-                    <li class="nav-item">
+                    <li class="nav-item dashboard-nav-item" style="display: none;">
                         <a class="nav-link" href="#" onclick="switchView('postpaid')">
                             <i class="fas fa-wifi gold-accent"></i> Postpaid
                         </a>
                     </li>
-                    <!-- WowFi Pro Prepaid -->
-                    <li class="nav-item">
+                    <li class="nav-item dashboard-nav-item" style="display: none;">
                         <a class="nav-link" href="#" onclick="switchView('wowfipro')">
                             <i class="fas fa-box-open gold-accent"></i> WowFi Pro
                         </a>
                     </li>
-                    <!-- SIM Sold -->
-                    <li class="nav-item">
+                    <li class="nav-item dashboard-nav-item" style="display: none;">
                         <a class="nav-link" href="#" onclick="switchView('simsold')">
                             <i class="fas fa-sim-card gold-accent"></i> SIM Sold
                         </a>
                     </li>
+                    <!-- END DYNAMIC DASHBOARD NAVIGATION -->
+
                     <!-- NEW: About Link -->
                     <li class="nav-item">
                         <a class="nav-link" href="#" onclick="switchView('about')">
@@ -289,7 +289,44 @@
             <!-- ============================================== -->
             <div id="home-view" class="view-section">
                 <h1 class="text-center fw-bold mb-5 gold-accent">Dashboard Menu</h1>
-                <div class="row g-4">
+                
+                <!-- NEW: Projects Section -->
+                <div id="project-grid-view" class="futuristic-card mb-5">
+                    <h2 class="text-white fw-bold mb-4">Select a Project Area</h2>
+                    <div class="row g-4">
+                        
+                        <!-- Project FSF Area: Eastern Visayas (This button will now contain the dashboard links) -->
+                        <div class="col-12 col-lg-4">
+                            <div class="grid-button" onclick="switchProjectView('FSF-EV')">
+                                <i class="fas fa-map-marked-alt gold-accent"></i>
+                                <span>FSF - Eastern Visayas</span>
+                                <p class="text-white-50 mt-1 mb-0" style="font-size: 0.8rem;">Project FSF</p>
+                                <!-- Sub-navigation structure is now moved to the main navbar -->
+                            </div>
+                        </div>
+
+                        <!-- Project Command: Northern Luzon -->
+                        <div class="col-12 col-lg-4">
+                            <div class="grid-button" onclick="switchProjectView('COMMAND-NL')">
+                                <i class="fas fa-satellite-dish gold-accent"></i>
+                                <span>COMMAND - Northern Luzon</span>
+                                <p class="text-white-50 mt-1 mb-0" style="font-size: 0.8rem;">Project Command</p>
+                            </div>
+                        </div>
+
+                        <!-- Project Opella: MDC (Nationwide) -->
+                        <div class="col-12 col-lg-4">
+                            <div class="grid-button" onclick="switchProjectView('OPELLA-MD')">
+                                <i class="fas fa-globe-americas gold-accent"></i>
+                                <span>OPELLA - MDC (Nationwide)</span>
+                                <p class="text-white-50 mt-1 mb-0" style="font-size: 0.8rem;">Project Opella</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Original dashboard buttons hidden -->
+                <div class="row g-4" style="display: none;">
                     
                     <!-- Mandays Button -->
                     <div class="col-6 col-lg-3">
@@ -596,6 +633,9 @@ Use of these materials by clients and stakeholders is permitted solely for inter
         let chartInstances = {}; 
         let attendanceDataCache = null; // Cache for the seller attendance matrix
         let currentCalendarDate = new Date(); // Tracks the currently displayed month/year
+        
+        // NEW: Variable to hold the current selected project for data filtering
+        let currentProject = 'FSF-EV'; // Default project
 
         // !! SECURITY WARNING !!
         // Exposing your API Key in the frontend is highly insecure.
@@ -605,6 +645,31 @@ Use of these materials by clients and stakeholders is permitted solely for inter
         const SPREADSHEET_ID = '10rPB-U5hdtdAkyfZlcmr82Fg_SnV1P8g5nwQ_D-0ABI'; // Your main Spreadsheet ID
         // UPDATED BASE_URL for the Google Visualization Query Language endpoint
         const QUERY_URL = 'https://docs.google.com/spreadsheets/d/';
+
+        // =========================================================================
+        // NEW: Project-specific logic for switching the entire dashboard view.
+        // This function sets the project context and navigates to the Mandays view.
+        // =========================================================================
+        function switchProjectView(projectCode) {
+            currentProject = projectCode;
+            // Optionally, you might change the SPREADSHEET_ID here based on projectCode
+            console.log(`Switched to Project: ${currentProject}`);
+            
+            // This is the core modification: show the sub-navigation links when FSF-EV is clicked.
+            if (projectCode === 'FSF-EV') {
+                // Clicking FSF-EV now switches directly to the Manpower Monitoring view.
+                switchView('mandays');
+            } else {
+                // For other projects, show a placeholder or future implementation view
+                switchView('mandays'); // Temporarily loading mandays for all
+            }
+            
+            // FIX: Show the dashboard navigation links when a project is selected
+            document.querySelectorAll('.dashboard-nav-item').forEach(item => {
+                item.style.display = 'block';
+            });
+        }
+
 
         // =========================================================================
         // NEW: MULTI-SHEET ATTENDANCE CONFIGURATION (EDIT THIS OBJECT)
@@ -622,6 +687,17 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                 { sheet: 'October 1 to 15, 2025', range: 'C3:AI17', endDay: 15 },
                 { sheet: 'October 16 to 31, 2025', range: 'C3:AI17', endDay: 31 }
             ]
+            // NOTE: In a real app, you'd nest this config by project:
+            /*
+            PROJECT_CONFIGS = {
+                'FSF-EV': {
+                    '9/2025': [ ... FSF periods ]
+                },
+                'COMMAND-NL': {
+                    '9/2025': [ ... COMMAND periods ]
+                }
+            }
+            */
         };
 
         /**
@@ -636,6 +712,8 @@ Use of these materials by clients and stakeholders is permitted solely for inter
             const year = date.getFullYear();
             const key = `${month}/${year}`;
             
+            // NOTE: For a multi-project setup, this would be: 
+            // const periods = PROJECT_CONFIGS[currentProject][key];
             const periods = ATTENDANCE_CONFIG[key];
             
             if (periods) {
@@ -1569,6 +1647,12 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                     }
                 }
             }
+            
+            // Toggle visibility of dashboard nav links based on view
+            const isHome = viewId === 'home';
+            document.querySelectorAll('.dashboard-nav-item').forEach(item => {
+                item.style.display = isHome ? 'none' : 'block';
+            });
         }
 
         // --- Bootstrap Collapse Event Listeners for Dynamic Data Loading ---
