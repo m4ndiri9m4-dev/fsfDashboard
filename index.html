@@ -22,17 +22,36 @@
     <style>
         body {
             font-family: 'Orbitron', sans-serif;
-            background-image: url('elle_logo.png');
+            /* FIX: Replaced gradient with image and added responsive background properties */
+            background-image: url('elle_logo.png'); 
+            background-size: cover; /* Ensures image covers the entire viewport */
             background-position: center;
+            background-repeat: no-repeat;
+            background-size: cover;
+            background-attachment: fixed; /* Fixes background during scroll */
+            
             color: white;
             min-height: 100vh;
             padding-top: 70px; /* Space for fixed navbar */
         }
+        /* ADDED: Overlay for better readability on top of the image background */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Semi-transparent dark overlay over the image */
+            background-color: rgba(0, 0, 0, 0.6); 
+            z-index: -1;
+        }
+
         .gold-accent {
             color: #FFD700 !important; /* Gold accent color */
         }
         .futuristic-card {
-            background-color: rgba(0, 0, 0, 0.5);
+            background-color: rgba(0, 0, 0, 0.7); /* Slightly darker card for contrast */
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.2);
             box-shadow: 0 4px 30px rgba(0, 0, 0, 0.2);
@@ -280,7 +299,7 @@
         <div class="container">
             <!-- Navbar Brand: Replaced text with image -->
             <a class="navbar-brand" href="#" onclick="switchView('home')">
-                <img src="elle_logo.png" alt="ELLE,CCMGI-ERP Logo" class="navbar-logo">
+                <img src="Gemini_Generated_Image_goqpahgoqpahgoqp.jpg" alt="ELLE,CCMGI-ERP Logo" class="navbar-logo">
             </a>
             <button class="navbar-toggler navbar-toggler-right" type="button" data-bs-toggle="collapse" data-bs-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
                 <span class="navbar-toggler-icon"></span>
@@ -982,7 +1001,7 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                 const dateColumnsStart = 3; 
                 const dateHeaders = headerRow.slice(dateColumnsStart);
 
-                // --- DYNAMIC TARGET CALCULATION ---
+                // --- DYNAMIC/HARDCODED TARGET CALCULATION ---
                 let workingDaysCount = 0; // Days that are NOT Sunday and NOT a specified holiday
                 const dailySellerTarget = 8;
                 const dailyTLTarget = 1;
@@ -1022,10 +1041,11 @@ Use of these materials by clients and stakeholders is permitted solely for inter
                 const calculatedTLTarget = workingDaysCount * dailyTLTarget;
                 const calculatedSellerTarget = workingDaysCount * dailySellerTarget;
 
-                // Use calculated targets
+                // --- FIX: Implement the hardcoded target for September ---
+                const isSeptember2025 = monthYearKey === '9/2025';
                 const tlTarget = calculatedTLTarget;
-                const sellerTarget = calculatedSellerTarget;
-                // --- END DYNAMIC TARGET CALCULATION ---
+                const sellerTarget = isSeptember2025 ? 176 : calculatedSellerTarget;
+                // --- END TARGET FIX ---
 
                 sellerRows.forEach(row => {
                     const designation = (row[2] || '').trim().toUpperCase();
